@@ -1,0 +1,16 @@
+// electron/preload.cjs
+// CommonJS format for Electron preload script
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  // 文件操作
+  getConfigPath: () => ipcRenderer.invoke('get-config-path'),
+  readFile: (path) => ipcRenderer.invoke('read-file', path),
+  writeFile: (path, content) => ipcRenderer.invoke('write-file', path, content),
+  openFileDialog: () => ipcRenderer.invoke('open-file-dialog'),
+  saveFileDialog: (defaultPath) => ipcRenderer.invoke('save-file-dialog', defaultPath),
+
+  // 平台信息
+  platform: process.platform,
+  isElectron: true,
+});
