@@ -20,7 +20,6 @@ import {
   ExperimentalConfigPanel,
   MiscConfigPanel,
   // Oh My OpenCode 组件
-  OmoPresetsPanel,
   OmoAgentsPanel,
   OmoCategoriesPanel,
   OmoBackgroundPanel,
@@ -75,7 +74,7 @@ export default function App() {
     if (mode === 'opencode') {
       setActiveNav('model');
     } else {
-      setActiveNav('omo-presets');
+      setActiveNav('omo-agents');
     }
   };
 
@@ -131,8 +130,6 @@ export default function App() {
 
     // Oh My OpenCode 模式
     switch (activeNav) {
-      case 'omo-presets':
-        return <OmoPresetsPanel />;
       case 'omo-agents':
         return <OmoAgentsPanel />;
       case 'omo-categories':
@@ -150,7 +147,7 @@ export default function App() {
       case 'omo-experimental':
         return <OmoExperimentalPanel />;
       default:
-        return <OmoPresetsPanel />;
+        return <OmoAgentsPanel />;
     }
   };
 

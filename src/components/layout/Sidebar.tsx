@@ -21,7 +21,6 @@ import {
   FlaskConical,
   MoreHorizontal,
   Sparkles,
-  Zap,
   Layers,
   Terminal,
   Ban,
@@ -50,7 +49,6 @@ export type OpenCodeNavItem =
 
 // Oh My OpenCode 导航项类型
 export type OmoNavItem =
-  | 'omo-presets'
   | 'omo-agents'
   | 'omo-categories'
   | 'omo-background'
@@ -97,7 +95,6 @@ const openCodeNavItems: { id: OpenCodeNavItem; label: string; icon: React.Elemen
 
 // Oh My OpenCode 导航项
 const omoNavItems: { id: OmoNavItem; label: string; icon: React.ElementType }[] = [
-  { id: 'omo-presets', label: '快速预设', icon: Zap },
   { id: 'omo-agents', label: '代理模型覆盖', icon: Bot },
   { id: 'omo-categories', label: '任务分类模型', icon: Layers },
   { id: 'omo-background', label: '后台任务', icon: Settings2 },

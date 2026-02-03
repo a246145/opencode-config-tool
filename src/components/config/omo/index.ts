@@ -1,5 +1,4 @@
 // src/components/config/omo/index.ts
-export { OmoPresetsPanel } from './OmoPresetsPanel';
 export { OmoAgentsPanel } from './OmoAgentsPanel';
 export { OmoCategoriesPanel } from './OmoCategoriesPanel';
 export { OmoBackgroundPanel } from './OmoBackgroundPanel';
