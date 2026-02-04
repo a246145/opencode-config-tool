@@ -20,10 +20,9 @@
 ## [1.0.3] - 2026-02-03
 
 ### 新增
-- ✨ **跨平台配置路径支持**：自动检测操作系统并使用正确的配置目录
-  - Windows: `%LOCALAPPDATA%\opencode\`
-  - macOS: `~/.config/opencode/`
-  - Linux: `$XDG_CONFIG_HOME/opencode/` 或 `~/.config/opencode/`
+- ✨ **跨平台配置路径支持**：所有平台统一使用 `~/.config/opencode/` 目录
+  - Windows: `%USERPROFILE%\.config\opencode\`
+  - macOS/Linux: `~/.config/opencode/`
 - ✨ **模型变体添加对话框**：使用友好的对话框替代浏览器原生 prompt，支持回车快捷键
 
 ### 修复

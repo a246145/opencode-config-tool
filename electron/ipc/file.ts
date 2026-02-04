@@ -5,20 +5,12 @@ import * as path from 'path';
 import * as os from 'os';
 
 // 获取跨平台配置目录
+// OpenCode 官方文档: ~/.config/opencode/ (所有平台统一)
+// Windows: %USERPROFILE%\.config\opencode\
+// macOS/Linux: ~/.config/opencode/
 function getConfigDir(): string {
   const homeDir = os.homedir();
-  const platform = process.platform;
-
-  if (platform === 'win32') {
-    // Windows: %LOCALAPPDATA%\opencode 或 %APPDATA%\opencode
-    return path.join(process.env.LOCALAPPDATA || path.join(homeDir, 'AppData', 'Local'), 'opencode');
-  } else if (platform === 'darwin') {
-    // macOS: ~/.config/opencode
-    return path.join(homeDir, '.config', 'opencode');
-  } else {
-    // Linux: ~/.config/opencode (遵循 XDG 规范)
-    return path.join(process.env.XDG_CONFIG_HOME || path.join(homeDir, '.config'), 'opencode');
-  }
+  return path.join(homeDir, '.config', 'opencode');
 }
 
 // 获取默认 OpenCode 配置路径
