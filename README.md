@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.2-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.3-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
 
@@ -307,22 +307,35 @@ OpenCode 懒人配置工具是一个基于 Electron + React 的桌面应用程�
 
 ### WebUI 模式（浏览器访问）
 
-#### 启动 Web 服务器
+WebUI 模式需要同时启动前端和后端服务器。
+
+#### 启动步骤
 
 ```bash
-# 开发模式
-npm run dev
+# 1. 启动后端 API 服务器（必须先启动）
+npm run server:dev
 
-# 生产模式
+# 2. 在另一个终端启动前端开发服务器
+npm run dev
+```
+
+#### 生产模式
+
+```bash
+# 构建前端
 npm run build
-npm run preview
+
+# 启动后端服务器（同时提供静态文件）
+npm run server:start
 ```
 
 #### 访问界面
 
-1. 打开浏览器访问 `http://localhost:5173`
+1. 打开浏览器访问 `http://localhost:5173`（开发模式）或 `http://localhost:3456`（生产模式）
 2. 功能与桌面版完全相同
 3. 适合远程配置或无需安装场景
+
+> **注意**：WebUI 模式下如果只启动前端而没有启动后端服务器，会显示"WebUI 服务器未运行"的提示。
 
 ---
 
@@ -330,17 +343,20 @@ npm run preview
 
 ### 配置文件位置
 
-#### 默认位置
-- **Windows**: `C:\Users\<用户名>\.opencode\config.json`
-- **macOS**: `~/.opencode/config.json`
-- **Linux**: `~/.opencode/config.json`
+根据 OpenCode 官方文档，所有平台统一使用 `~/.config/opencode/` 目录：
+
+| 平台 | OpenCode 配置 | Oh My OpenCode 配置 |
+|------|--------------|---------------------|
+| **Windows** | `%USERPROFILE%\.config\opencode\opencode.json` | `%USERPROFILE%\.config\opencode\oh-my-opencode.json` |
+| **macOS** | `~/.config/opencode/opencode.json` | `~/.config/opencode/oh-my-opencode.json` |
+| **Linux** | `~/.config/opencode/opencode.json` | `~/.config/opencode/oh-my-opencode.json` |
 
 #### 自定义位置
-可以通过应用界面选择任意位置的配置文件。
+可以通过环境变量 `OPENCODE_CONFIG` 指定自定义配置文件路径。
 
 ### 支持的配置项
 
-#### 基础配置
+#### OpenCode 基础配置
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
@@ -349,6 +365,28 @@ npm run preview
   "theme": "dark",
   "autoupdate": true,
   "share": "auto"
+}
+```
+
+#### Oh My OpenCode 配置
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/.../oh-my-opencode.schema.json",
+  "agents": {
+    "oracle": { "model": "provider/model-id", "temperature": 0.7 },
+    "architect": { "model": "provider/model-id" }
+  },
+  "categories": {
+    "quick": { "model": "provider/model-id", "variant": "low" },
+    "bigbrain": { "model": "provider/model-id", "variant": "high" }
+  },
+  "background_task": {
+    "maxConcurrentAgents": 5,
+    "taskTimeout": 300000
+  },
+  "disabled_hooks": [],
+  "disabled_agents": [],
+  "disabled_mcps": []
 }
 ```
 
@@ -480,16 +518,20 @@ npm run preview
 opencode-config-tool/
 ├── 📁 electron/              # Electron 主进程
 │   ├── main.ts              # 主进程入口
-│   ├── preload.ts           # 预加载脚本
+│   ├── preload.cjs          # 预加载脚本 (CommonJS)
+│   ├── preload.ts           # 预加载脚本 (TypeScript)
 │   └── ipc/                 # IPC 通信模块
-│       └── file.ts          # 文件操作 IPC
+│       └── file.ts          # 文件操作 IPC（跨平台路径支持）
 │
-├── 📁 src/                   # 源代码
+├── 📁 server/               # WebUI 后端服务器
+│   └── index.ts             # Express API 服务器
+│
+├── 📁 src/                   # 前端源代码
 │   ├── App.tsx              # 应用根组件
 │   ├── main.tsx             # React 入口
 │   │
 │   ├── 📁 components/       # React 组件
-│   │   ├── 📁 config/       # 配置组件
+│   │   ├── 📁 config/       # OpenCode 配置组件
 │   │   │   ├── ModelConfig.tsx        # 模型配置
 │   │   │   ├── ProviderConfig.tsx     # Provider 配置
 │   │   │   ├── AgentManager.tsx       # Agent 管理
@@ -499,56 +541,64 @@ opencode-config-tool/
 │   │   │   ├── InstructionsEditor.tsx # 指令编辑器
 │   │   │   ├── ThemeSelector.tsx      # 主题选择器
 │   │   │   ├── PluginManager.tsx      # 插件管理
-│   │   │   └── OtherSettings.tsx      # 其他设置
+│   │   │   ├── LspConfig.tsx          # LSP 配置
+│   │   │   ├── TuiConfig.tsx          # TUI 配置
+│   │   │   ├── ServerConfig.tsx       # 服务器配置
+│   │   │   ├── FormatterConfig.tsx    # 格式化配置
+│   │   │   ├── CompactionConfig.tsx   # 压缩配置
+│   │   │   ├── ExperimentalConfig.tsx # 实验性功能
+│   │   │   ├── MiscConfig.tsx         # 杂项配置
+│   │   │   ├── OtherSettings.tsx      # 其他设置
+│   │   │   └── 📁 omo/                # Oh My OpenCode 配置组件
+│   │   │       ├── OmoAgentsPanel.tsx      # 代理模型覆盖
+│   │   │       ├── OmoCategoriesPanel.tsx  # 任务分类模型
+│   │   │       ├── OmoBackgroundPanel.tsx  # 后台任务配置
+│   │   │       ├── OmoTmuxPanel.tsx        # Tmux 集成
+│   │   │       ├── OmoSisyphusPanel.tsx    # 西西弗斯代理
+│   │   │       ├── OmoDisabledPanel.tsx    # 禁用功能
+│   │   │       ├── OmoClaudeCodePanel.tsx  # Claude Code 兼容
+│   │   │       └── OmoExperimentalPanel.tsx # 实验性功能
 │   │   │
 │   │   ├── 📁 layout/       # 布局组件
-│   │   │   ├── Header.tsx             # 顶部栏
-│   │   │   ├── Sidebar.tsx            # 侧边栏
+│   │   │   ├── Header.tsx             # 顶部栏（含 Tab 切换）
+│   │   │   ├── Sidebar.tsx            # 侧边栏（双模式导航）
 │   │   │   ├── MainContent.tsx        # 主内容区
 │   │   │   └── Card.tsx               # 卡片容器
 │   │   │
 │   │   ├── 📁 ui/           # UI 基础组件（shadcn/ui）
-│   │   │   ├── button.tsx
-│   │   │   ├── input.tsx
-│   │   │   ├── select.tsx
-│   │   │   ├── switch.tsx
-│   │   │   ├── tabs.tsx
-│   │   │   ├── dialog.tsx
-│   │   │   ├── dropdown-menu.tsx
-│   │   │   ├── toast.tsx
-│   │   │   └── ...
 │   │   │
-│   │   └── TemplateDialog.tsx # 模板对话框
+│   │   ├── TemplateDialog.tsx    # OpenCode 模板对话框
+│   │   ├── OmoPresetsDialog.tsx  # Oh My OpenCode 预设对话框
+│   │   ├── ImportExportDialog.tsx # 导入导出对话框
+│   │   └── JsonPreview.tsx       # JSON 预览面板
 │   │
 │   ├── 📁 hooks/            # React Hooks
-│   │   ├── useConfig.ts     # 配置管理 Hook
-│   │   ├── useTheme.ts      # 主题管理 Hook
-│   │   └── use-toast.ts     # Toast 通知 Hook
+│   │   ├── useConfig.ts          # OpenCode 配置管理
+│   │   ├── useOhMyOpenCode.ts    # Oh My OpenCode 配置管理
+│   │   ├── useTheme.ts           # 主题管理
+│   │   └── use-toast.ts          # Toast 通知
 │   │
 │   ├── 📁 lib/              # 工具库
-│   │   ├── utils.ts         # 通用工具函数
-│   │   ├── fileService.ts   # 文件服务
-│   │   ├── templates.ts     # 配置模板
-│   │   └── defaults.ts      # 默认配置
+│   │   ├── utils.ts              # 通用工具函数
+│   │   ├── templates.ts          # OpenCode 配置模板
+│   │   ├── defaults.ts           # OpenCode 默认配置
+│   │   ├── oh-my-opencode-defaults.ts  # OMO 默认配置
+│   │   └── oh-my-opencode-presets.ts   # OMO 预设配置
 │   │
 │   ├── 📁 types/            # TypeScript 类型定义
-│   │   └── config.ts        # OpenCode 配置类型
+│   │   ├── config.ts             # OpenCode 配置类型
+│   │   ├── oh-my-opencode.ts     # Oh My OpenCode 配置类型
+│   │   └── electron.d.ts         # Electron API 类型
 │   │
 │   └── 📁 styles/           # 样式文件
-│       └── globals.css      # 全局样式
-│
-├── 📁 server/               # Web 服务器（可选）
-│   └── index.ts             # Express 服务器
-│
-├── 📁 docs/                 # 文档
-│   ├── config-components-summary.md
-│   └── layout-components.md
+│       └── globals.css           # 全局样式
 │
 ├── 📄 package.json          # 项目配置
 ├── 📄 vite.config.ts        # Vite 配置
 ├── 📄 tailwind.config.js    # Tailwind 配置
 ├── 📄 tsconfig.json         # TypeScript 配置
-├── 📄 components.json       # shadcn/ui 配置
+├── 📄 CLAUDE.md             # Claude Code 指令
+├── 📄 CHANGELOG.md          # 更新日志
 └── 📄 README.md             # 本文档
 ```
 
@@ -837,9 +887,18 @@ SOFTWARE.
 
 查看完整的版本更新历史和变更记录：**[CHANGELOG.md](CHANGELOG.md)**
 
-### 最新版本 v1.0.2 (2026-02-03)
+### 最新版本 v1.0.3 (2026-02-03)
+- ✨ **跨平台配置路径支持** - 所有平台统一使用 `~/.config/opencode/` 目录
+- ✨ **模型变体添加对话框** - 使用友好的对话框替代浏览器原生 prompt
+- 🐛 修复 Windows 系统无法正确加载配置的问题
+- 🐛 修复 Windows 窗口标题显示为【OMO 配置】
+- 🐛 修复 Anthropic 扩展思考启用时自动填充默认思考预算 10000
+- 🐛 修复模型变体添加按钮无反应的问题
+
+### v1.0.2 (2026-02-03)
 - ✨ **Oh My OpenCode 独立配置模式** - 顶部 Tab 切换，独立侧边栏和操作按钮
-- ✨ **9 个独立配置面板** - 快速预设、Agents、Categories、后台任务、Tmux、Sisyphus、禁用功能、Claude Code、实验性功能
+- ✨ **8 个独立配置面板** - Agents、Categories、后台任务、Tmux、Sisyphus、禁用功能、Claude Code、实验性功能
+- ✨ **模型下拉选择** - 从 OpenCode 配置中加载已配置的模型
 - ✨ **WebUI 加载动画** - 配置加载时显示加载状态
 - 🐛 修复多个 UI 显示问题和 WebUI 服务器兼容性问题
 
