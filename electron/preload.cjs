@@ -5,6 +5,8 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('electronAPI', {
   // 文件操作
   getConfigPath: () => ipcRenderer.invoke('get-config-path'),
+  getOmoConfigPath: () => ipcRenderer.invoke('get-omo-config-path'),
+  getConfigDir: () => ipcRenderer.invoke('get-config-dir'),
   readFile: (path) => ipcRenderer.invoke('read-file', path),
   writeFile: (path, content) => ipcRenderer.invoke('write-file', path, content),
   openFileDialog: () => ipcRenderer.invoke('open-file-dialog'),

@@ -11,6 +11,8 @@
 export interface ElectronAPI {
   // File operations
   getConfigPath: () => Promise<string>;
+  getOmoConfigPath: () => Promise<string>;
+  getConfigDir: () => Promise<string>;
   readFile: (path: string) => Promise<string>;
   writeFile: (path: string, content: string) => Promise<boolean>;
   openFileDialog: () => Promise<string | null>;

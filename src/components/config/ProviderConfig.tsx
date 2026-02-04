@@ -231,6 +231,10 @@ export function ProviderConfig() {
   const [newWhitelistModel, setNewWhitelistModel] = useState('');
   const [newBlacklistModel, setNewBlacklistModel] = useState('');
   const [newEnvVar, setNewEnvVar] = useState('');
+  // 变体添加对话框状态
+  const [variantDialogOpen, setVariantDialogOpen] = useState(false);
+  const [variantModelId, setVariantModelId] = useState('');
+  const [newVariantName, setNewVariantName] = useState('');
 
   const providers = config.provider || {};
 
@@ -1019,13 +1023,29 @@ export function ProviderConfig() {
                                       <Label className="text-xs">状态</Label>
                                       <Select
                                         value={model.options?.thinking?.type || ''}
-                                        onValueChange={(value) => handleUpdateModel(modelId, 'options', {
-                                          ...model.options,
-                                          thinking: value ? {
-                                            ...model.options?.thinking,
-                                            type: value as 'enabled' | 'disabled',
-                                          } : undefined,
-                                        })}
+                                        onValueChange={(value) => {
+                                          if (value === 'enabled') {
+                                            // 启用时自动设置默认思考预算
+                                            handleUpdateModel(modelId, 'options', {
+                                              ...model.options,
+                                              thinking: {
+                                                type: 'enabled',
+                                                budgetTokens: model.options?.thinking?.budgetTokens || 10000,
+                                              },
+                                            });
+                                          } else if (value === 'disabled') {
+                                            handleUpdateModel(modelId, 'options', {
+                                              ...model.options,
+                                              thinking: { type: 'disabled' },
+                                            });
+                                          } else {
+                                            // 清除
+                                            handleUpdateModel(modelId, 'options', {
+                                              ...model.options,
+                                              thinking: undefined,
+                                            });
+                                          }
+                                        }}
                                       >
                                         <SelectTrigger>
                                           <SelectValue placeholder="选择状态" />
@@ -1050,6 +1070,7 @@ export function ProviderConfig() {
                                           },
                                         })}
                                         placeholder="10000"
+                                        disabled={model.options?.thinking?.type !== 'enabled'}
                                       />
                                     </div>
                                   </div>
@@ -1074,13 +1095,9 @@ export function ProviderConfig() {
                                   variant="outline"
                                   size="sm"
                                   onClick={() => {
-                                    const variantName = prompt('请输入变体名称 (如 high, low):');
-                                    if (variantName) {
-                                      handleUpdateModel(modelId, 'variants', {
-                                        ...model.variants,
-                                        [variantName]: {},
-                                      });
-                                    }
+                                    setVariantModelId(modelId);
+                                    setNewVariantName('');
+                                    setVariantDialogOpen(true);
                                   }}
                                 >
                                   <Plus className="h-4 w-4 mr-1" />
@@ -1218,6 +1235,70 @@ export function ProviderConfig() {
             </Button>
             <Button onClick={handleSaveProvider} disabled={!editingProvider?.id}>
               保存
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 添加变体名称对话框 */}
+      <Dialog open={variantDialogOpen} onOpenChange={setVariantDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>添加模型变体</DialogTitle>
+            <DialogDescription>
+              为模型创建一个新的参数变体，可通过 Ctrl+T 在变体间切换
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="variant-name">变体名称</Label>
+            <Input
+              id="variant-name"
+              value={newVariantName}
+              onChange={(e) => setNewVariantName(e.target.value)}
+              placeholder="如: high, low, thinking"
+              className="mt-2"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newVariantName.trim()) {
+                  e.preventDefault();
+                  if (editingProvider && variantModelId) {
+                    const model = editingProvider.models[variantModelId];
+                    if (model) {
+                      handleUpdateModel(variantModelId, 'variants', {
+                        ...model.variants,
+                        [newVariantName.trim()]: {},
+                      });
+                    }
+                  }
+                  setVariantDialogOpen(false);
+                  setNewVariantName('');
+                }
+              }}
+            />
+            <p className="text-xs text-muted-foreground mt-2">
+              常用变体名称: high (高性能), low (低消耗), thinking (深度思考), fast (快速响应)
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setVariantDialogOpen(false)}>
+              取消
+            </Button>
+            <Button
+              onClick={() => {
+                if (editingProvider && variantModelId && newVariantName.trim()) {
+                  const model = editingProvider.models[variantModelId];
+                  if (model) {
+                    handleUpdateModel(variantModelId, 'variants', {
+                      ...model.variants,
+                      [newVariantName.trim()]: {},
+                    });
+                  }
+                }
+                setVariantDialogOpen(false);
+                setNewVariantName('');
+              }}
+              disabled={!newVariantName.trim()}
+            >
+              添加
             </Button>
           </DialogFooter>
         </DialogContent>

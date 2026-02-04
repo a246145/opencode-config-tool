@@ -48,12 +48,16 @@ const isElectron = (): boolean => {
   return hasReadFile;
 };
 
-// Get config path based on scope
+// Get config path based on scope (跨平台支持)
 const getConfigPath = async (scope: 'global' | 'project'): Promise<string> => {
   if (scope === 'project') {
     return '.opencode/oh-my-opencode.json';
   }
-  // Global scope - use the same pattern as useConfig.ts
+  // Global scope - 使用 Electron API 获取跨平台路径
+  if (isElectron() && window.electronAPI?.getOmoConfigPath) {
+    return await window.electronAPI.getOmoConfigPath();
+  }
+  // Fallback for WebUI mode
   return '~/.config/opencode/oh-my-opencode.json';
 };
 
