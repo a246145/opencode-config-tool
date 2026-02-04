@@ -268,6 +268,22 @@ export function ProviderConfig() {
   const handleSaveProvider = () => {
     if (!editingProvider || !editingProvider.id) return;
 
+    // 处理模型配置，为启用扩展思考但没有 budgetTokens 的模型补充默认值
+    const processedModels: Record<string, ModelConfig> = {};
+    for (const [modelId, model] of Object.entries(editingProvider.models)) {
+      const processedModel = { ...model };
+      if (processedModel.options?.thinking?.type === 'enabled' && !processedModel.options.thinking.budgetTokens) {
+        processedModel.options = {
+          ...processedModel.options,
+          thinking: {
+            ...processedModel.options.thinking,
+            budgetTokens: 10000,
+          },
+        };
+      }
+      processedModels[modelId] = processedModel;
+    }
+
     const providerConfig: ProviderConfigType = {
       npm: editingProvider.npm,
       name: editingProvider.name,
@@ -279,7 +295,7 @@ export function ProviderConfig() {
         timeout: editingProvider.timeoutEnabled ? editingProvider.timeout : false,
         enterpriseUrl: editingProvider.enterpriseUrl || undefined,
       },
-      models: Object.keys(editingProvider.models).length > 0 ? editingProvider.models : undefined,
+      models: Object.keys(processedModels).length > 0 ? processedModels : undefined,
       whitelist: editingProvider.whitelist.length > 0 ? editingProvider.whitelist : undefined,
       blacklist: editingProvider.blacklist.length > 0 ? editingProvider.blacklist : undefined,
     };
