@@ -1,11 +1,6 @@
 import { app, BrowserWindow, shell } from 'electron';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
 import { setupFileIpc } from './ipc/file';
-
-// ES module equivalent of __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 let mainWindow: BrowserWindow | null = null;
 

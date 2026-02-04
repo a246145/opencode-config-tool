@@ -17,7 +17,30 @@
 
 ---
 
-## [1.0.3] - 2026-02-03
+## [1.0.4] - 2025-02-04
+
+### 新增
+- ✨ **应用图标**：为应用添加了专属图标（齿轮+代码符号设计）
+  - 支持 macOS (.icns)、Windows (.ico)、Linux (PNG) 格式
+  - 添加图标生成脚本 `npm run icons`
+
+### 修复
+- 🐛 **修复 macOS 构建签名问题**：解决 iCloud 同步目录导致的 codesign 扩展属性错误
+  - 将构建输出目录改为 `/tmp/opencode-release` 避免 iCloud 干扰
+  - 添加 afterPack 钩子自动清理扩展属性
+- 🐛 **修复应用启动崩溃问题**：解决 ESM/CommonJS 模块冲突
+  - 移除 `package.json` 中的 `"type": "module"` 配置
+  - Electron 主进程改用 CommonJS 模块格式
+
+### 改进
+- 📝 **构建产物命名优化**：文件名包含系统和架构标识
+  - 格式：`{产品名}-v{版本}-{系统}-{架构}.{扩展名}`
+  - 示例：`OpenCode Config Tool-v1.0.4-macos-arm64.dmg`
+- 📝 **跨平台构建支持**：macOS 上可同时构建 Windows 和 Linux 版本
+
+---
+
+## [1.0.3] - 2025-02-03
 
 ### 新增
 - ✨ **跨平台配置路径支持**：所有平台统一使用 `~/.config/opencode/` 目录
@@ -188,7 +211,9 @@
 
 ---
 
-[未发布]: https://github.com/a246145/opencode-config-tool/compare/v1.0.2...HEAD
+[未发布]: https://github.com/a246145/opencode-config-tool/compare/v1.0.4...HEAD
+[1.0.4]: https://github.com/a246145/opencode-config-tool/compare/v1.0.3...v1.0.4
+[1.0.3]: https://github.com/a246145/opencode-config-tool/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/a246145/opencode-config-tool/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/a246145/opencode-config-tool/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/a246145/opencode-config-tool/releases/tag/v1.0.0

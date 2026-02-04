@@ -32,6 +32,7 @@ dist-ssr
 release
 build/icons/*.png
 build/icon.ico
+build/icon.png
 build/icon.icns
 
 # OS files

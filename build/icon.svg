@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <!-- 主渐变 - 现代蓝紫色 -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="50%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#a855f7"/>
+    </linearGradient>
+    <!-- 齿轮渐变 -->
+    <linearGradient id="gearGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#e0e7ff"/>
+    </linearGradient>
+    <!-- 代码符号渐变 -->
+    <linearGradient id="codeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+    <!-- 阴影 -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="20" flood-color="#4c1d95" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- 背景圆角矩形 -->
+  <rect x="64" y="64" width="896" height="896" rx="180" ry="180" fill="url(#bgGradient)" filter="url(#shadow)"/>
+
+  <!-- 齿轮外圈 -->
+  <g transform="translate(512, 512)">
+    <!-- 齿轮主体 -->
+    <path d="
+      M 0 -280
+      L 40 -280 L 50 -240 L 70 -235 L 100 -260 L 130 -230 L 105 -200 L 115 -180 L 155 -170 L 155 -130
+      L 115 -120 L 105 -100 L 130 -70 L 100 -40 L 70 -65 L 50 -60 L 40 -20 L 0 -20
+      L -40 -20 L -50 -60 L -70 -65 L -100 -40 L -130 -70 L -105 -100 L -115 -120 L -155 -130 L -155 -170
+      L -115 -180 L -105 -200 L -130 -230 L -100 -260 L -70 -235 L -50 -240 L -40 -280
+      Z
+    " fill="url(#gearGradient)" opacity="0.15" transform="rotate(0)"/>
+
+    <!-- 简化的齿轮 - 8齿 -->
+    <g fill="url(#gearGradient)">
+      <!-- 外环 -->
+      <circle cx="0" cy="0" r="220" fill="none" stroke="url(#gearGradient)" stroke-width="60" opacity="0.9"/>
+      <!-- 齿 -->
+      <rect x="-30" y="-280" width="60" height="80" rx="8"/>
+      <rect x="-30" y="-280" width="60" height="80" rx="8" transform="rotate(45)"/>
+      <rect x="-30" y="-280" width="60" height="80" rx="8" transform="rotate(90)"/>
+      <rect x="-30" y="-280" width="60" height="80" rx="8" transform="rotate(135)"/>
+      <rect x="-30" y="-280" width="60" height="80" rx="8" transform="rotate(180)"/>
+      <rect x="-30" y="-280" width="60" height="80" rx="8" transform="rotate(225)"/>
+      <rect x="-30" y="-280" width="60" height="80" rx="8" transform="rotate(270)"/>
+      <rect x="-30" y="-280" width="60" height="80" rx="8" transform="rotate(315)"/>
+      <!-- 内圆 -->
+      <circle cx="0" cy="0" r="140" fill="url(#bgGradient)"/>
+      <circle cx="0" cy="0" r="120" fill="none" stroke="url(#gearGradient)" stroke-width="8" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- 代码符号 < / > -->
+  <g transform="translate(512, 512)" fill="url(#gearGradient)">
+    <!-- < 符号 -->
+    <path d="M -70 0 L -20 -50 L -20 -30 L -50 0 L -20 30 L -20 50 Z" stroke-width="0"/>
+    <!-- / 符号 -->
+    <rect x="-12" y="-55" width="24" height="110" rx="12" transform="rotate(-20)"/>
+    <!-- > 符号 -->
+    <path d="M 70 0 L 20 -50 L 20 -30 L 50 0 L 20 30 L 20 50 Z" stroke-width="0"/>
+  </g>
+</svg>

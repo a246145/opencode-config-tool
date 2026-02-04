@@ -2,56 +2,15 @@
   "appId": "com.opencode.config-tool",
   "productName": "OpenCode Config Tool",
   "copyright": "Copyright © 2024",
+  "afterPack": "./scripts/afterPack.cjs",
   "directories": {
-    "output": "release",
-    "buildResources": "build"
+    "output": "/tmp/opencode-release"
   },
   "files": [
     "dist/**/*",
     "dist-electron/**/*",
-    "package.json"
+    "electron/preload.cjs"
   ],
-  "extraResources": [
-    {
-      "from": "resources",
-      "to": "resources",
-      "filter": ["**/*"]
-    }
-  ],
-  "asar": true,
-  "asarUnpack": [
-    "**/*.node"
-  ],
-  "win": {
-    "target": [
-      {
-        "target": "nsis",
-        "arch": ["x64", "ia32"]
-      },
-      {
-        "target": "portable",
-        "arch": ["x64"]
-      }
-    ],
-    "icon": "build/icon.ico",
-    "artifactName": "${productName}-${version}-${arch}.${ext}",
-    "requestedExecutionLevel": "asInvoker"
-  },
-  "nsis": {
-    "oneClick": false,
-    "allowToChangeInstallationDirectory": true,
-    "perMachine": false,
-    "allowElevation": true,
-    "installerIcon": "build/icon.ico",
-    "uninstallerIcon": "build/icon.ico",
-    "installerHeaderIcon": "build/icon.ico",
-    "createDesktopShortcut": true,
-    "createStartMenuShortcut": true,
-    "shortcutName": "OpenCode Config Tool"
-  },
-  "portable": {
-    "artifactName": "${productName}-${version}-portable.${ext}"
-  },
   "mac": {
     "target": [
       {
@@ -69,59 +28,41 @@
     "gatekeeperAssess": false,
     "entitlements": "build/entitlements.mac.plist",
     "entitlementsInherit": "build/entitlements.mac.plist",
-    "artifactName": "${productName}-${version}-${arch}.${ext}"
+    "artifactName": "${productName}-v${version}-macos-${arch}.${ext}"
   },
-  "dmg": {
-    "contents": [
+  "win": {
+    "target": [
       {
-        "x": 130,
-        "y": 220
+        "target": "nsis",
+        "arch": ["x64"]
       },
       {
-        "x": 410,
-        "y": 220,
-        "type": "link",
-        "path": "/Applications"
+        "target": "portable",
+        "arch": ["x64"]
       }
     ],
-    "window": {
-      "width": 540,
-      "height": 380
-    }
+    "icon": "build/icon.ico",
+    "artifactName": "${productName}-v${version}-windows-${arch}.${ext}"
   },
   "linux": {
     "target": [
       {
         "target": "AppImage",
-        "arch": ["x64", "arm64"]
+        "arch": ["x64"]
       },
       {
         "target": "deb",
-        "arch": ["x64", "arm64"]
-      },
-      {
-        "target": "rpm",
         "arch": ["x64"]
       }
     ],
     "icon": "build/icons",
     "category": "Development",
-    "artifactName": "${productName}-${version}-${arch}.${ext}",
-    "synopsis": "OpenCode Configuration Tool",
-    "description": "A modern configuration tool for OpenCode settings"
+    "artifactName": "${productName}-v${version}-linux-${arch}.${ext}"
   },
-  "appImage": {
-    "license": "LICENSE"
-  },
-  "deb": {
-    "depends": [
-      "gconf2",
-      "gconf-service",
-      "libnotify4",
-      "libappindicator1",
-      "libxtst6",
-      "libnss3"
-    ]
-  },
-  "publish": null
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true
+  }
 }
