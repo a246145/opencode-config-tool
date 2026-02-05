@@ -3,6 +3,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Code2, Plus, X, ChevronDown, Settings2 } from 'lucide-react';
 import { useState } from 'react';
@@ -194,6 +195,29 @@ export function LspConfigPanel() {
                               })}
                               placeholder=".vue, .ts"
                             />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>初始化参数 (JSON)</Label>
+                            <Textarea
+                              value={(serverConfig as LspServerConfig).initialization ? JSON.stringify((serverConfig as LspServerConfig).initialization, null, 2) : ''}
+                              onChange={(e) => {
+                                try {
+                                  const init = e.target.value ? JSON.parse(e.target.value) : undefined;
+                                  updateLspServer(serverId, {
+                                    ...serverConfig as LspServerConfig,
+                                    initialization: init,
+                                  });
+                                } catch {
+                                  // Invalid JSON, ignore
+                                }
+                              }}
+                              placeholder='{"rootPatterns": [".git"]}'
+                              rows={3}
+                              className="font-mono text-xs"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                              传递给 LSP 服务器的初始化参数
+                            </p>
                           </div>
                         </CollapsibleContent>
                       </div>

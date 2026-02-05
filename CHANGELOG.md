@@ -17,7 +17,38 @@
 
 ---
 
-## [1.0.4] - 2025-02-04
+## [1.0.5] - 2026-02-04
+
+### 新增
+- ✨ **Oh My OpenCode 配置项完善**：
+  - `agents.*.variant` - 代理模型变体选择（如 max）
+  - `agents.*.thinking` - 代理扩展思考配置（启用/禁用、思考预算）
+  - `categories.*.temperature` - 分类温度设置
+  - `categories.*.thinking` - 分类扩展思考配置
+  - `categories.*.tools` - 分类工具启用/禁用配置
+  - `categories.*.prompt_append` - 分类提示追加内容
+  - `background_task.modelConcurrency` - 模型级并发配置
+  - `disabled_skills` - 禁用技能列表
+- ✨ **KNOWN_AGENTS 扩展**：新增 7 个官方代理
+  - `atlas` - 阿特拉斯（任务编排和多代理协调）
+  - `prometheus` - 普罗米修斯（规划代理）
+  - `sisyphus-junior` - 小西西弗斯（专注任务执行者）
+  - `multimodal-looker` - 多模态观察者（图像分析）
+  - `general` - 通用代理
+  - `build` - 构建代理
+  - `plan` - 规划代理
+- ✨ **OpenCode 配置项完善**：
+  - `provider.*.options.setCacheKey` - Anthropic 缓存键设置
+  - `lsp.*.initialization` - LSP 初始化参数（JSON 格式）
+
+### 改进
+- 📝 **中文友好化**：所有新增配置项均使用中文标签和描述
+- 📝 **UI 优化**：使用 Collapsible 组件折叠高级配置，保持界面简洁
+- 📝 **类型定义完善**：更新 TypeScript 类型以支持所有新配置项
+
+---
+
+## [1.0.4] - 2026-02-04
 
 ### 新增
 - ✨ **应用图标**：为应用添加了专属图标（齿轮+代码符号设计）
@@ -211,7 +242,8 @@
 
 ---
 
-[未发布]: https://github.com/a246145/opencode-config-tool/compare/v1.0.4...HEAD
+[未发布]: https://github.com/a246145/opencode-config-tool/compare/v1.0.5...HEAD
+[1.0.5]: https://github.com/a246145/opencode-config-tool/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/a246145/opencode-config-tool/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/a246145/opencode-config-tool/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/a246145/opencode-config-tool/compare/v1.0.1...v1.0.2

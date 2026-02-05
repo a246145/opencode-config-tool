@@ -1,24 +1,34 @@
 // src/types/oh-my-opencode.ts
 // oh-my-opencode 配置类型定义
 
+export interface OmocThinkingConfig {
+  type: 'enabled' | 'disabled';
+  budgetTokens?: number;
+}
+
 export interface OmocAgentModelOverride {
   model: string;
   temperature?: number;
-  thinking?: {
-    type: 'enabled' | 'disabled';
-    budgetTokens?: number;
-  };
+  variant?: string;  // 模型变体，如 "max"
+  thinking?: OmocThinkingConfig;
 }
 
 export interface OmocCategoryConfig {
   model: string;
   variant?: 'low' | 'medium' | 'high' | 'xhigh' | 'max';
+  temperature?: number;
+  top_p?: number;
+  prompt_append?: string;  // 追加到系统提示的内容
+  description?: string;    // 分类描述
+  thinking?: OmocThinkingConfig;
+  tools?: Record<string, boolean>;  // 工具启用/禁用配置
 }
 
 export interface OmocBackgroundTaskConfig {
   defaultConcurrency?: number;
   staleTimeoutMs?: number;
   providerConcurrency?: Record<string, number>;
+  modelConcurrency?: Record<string, number>;  // 按模型设置并发数
 }
 
 export interface OmocTmuxConfig {
@@ -56,6 +66,7 @@ export interface OhMyOpenCodeConfig {
   disabled_hooks?: string[];
   disabled_agents?: string[];
   disabled_mcps?: string[];
+  disabled_skills?: string[];
   claude_code?: OmocClaudeCodeConfig;
   experimental?: OmocExperimentalConfig;
 }
@@ -80,9 +91,16 @@ export interface OmocInstallOptions {
 
 // 已知的 Agent 列表（带中文名称和描述）
 export const KNOWN_AGENTS = [
-  { id: 'oracle', name: '神谕者', description: '智能问答和知识检索' },
-  { id: 'librarian', name: '图书管理员', description: '文档和代码库管理' },
-  { id: 'explore', name: '探索者', description: '代码库探索和分析' },
+  { id: 'oracle', name: '神谕者', description: '高智商推理专家，架构设计和复杂调试' },
+  { id: 'librarian', name: '图书管理员', description: '文档查询和知识检索' },
+  { id: 'explore', name: '探索者', description: '代码库探索和上下文搜索' },
+  { id: 'atlas', name: '阿特拉斯', description: '任务编排和多代理协调' },
+  { id: 'prometheus', name: '普罗米修斯', description: '规划代理，任务分解和策略制定' },
+  { id: 'sisyphus-junior', name: '小西西弗斯', description: '专注任务执行者，无委派能力' },
+  { id: 'multimodal-looker', name: '多模态观察者', description: '图像分析和视觉处理' },
+  { id: 'general', name: '通用代理', description: '通用任务执行和多步骤操作' },
+  { id: 'build', name: '构建代理', description: '默认代理，基于权限执行工具' },
+  { id: 'plan', name: '规划代理', description: '规划模式，禁用所有编辑工具' },
   { id: 'Sisyphus', name: '西西弗斯', description: '持久化任务执行' },
   { id: 'architect', name: '架构师', description: '系统设计和架构规划' },
   { id: 'executor', name: '执行者', description: '代码执行和任务完成' },

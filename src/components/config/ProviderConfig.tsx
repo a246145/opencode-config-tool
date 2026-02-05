@@ -205,6 +205,7 @@ interface ProviderFormData {
   timeoutEnabled: boolean;
   enterpriseUrl: string;
   env: string[];
+  setCacheKey: boolean;
 }
 
 const emptyProvider: ProviderFormData = {
@@ -221,6 +222,7 @@ const emptyProvider: ProviderFormData = {
   timeoutEnabled: true,
   enterpriseUrl: '',
   env: [],
+  setCacheKey: false,
 };
 
 export function ProviderConfig() {
@@ -260,6 +262,7 @@ export function ProviderConfig() {
         timeoutEnabled: provider.options?.timeout !== false,
         enterpriseUrl: provider.options?.enterpriseUrl || '',
         env: provider.env || [],
+        setCacheKey: provider.options?.setCacheKey ?? false,
       });
       setIsDialogOpen(true);
     }
@@ -294,6 +297,7 @@ export function ProviderConfig() {
         headers: Object.keys(editingProvider.headers).length > 0 ? editingProvider.headers : undefined,
         timeout: editingProvider.timeoutEnabled ? editingProvider.timeout : false,
         enterpriseUrl: editingProvider.enterpriseUrl || undefined,
+        setCacheKey: editingProvider.setCacheKey || undefined,
       },
       models: Object.keys(processedModels).length > 0 ? processedModels : undefined,
       whitelist: editingProvider.whitelist.length > 0 ? editingProvider.whitelist : undefined,
@@ -738,6 +742,20 @@ export function ProviderConfig() {
                     设置 API 请求超时时间。关闭开关表示禁用超时限制。
                   </p>
                 </div>
+
+                {/* Cache Key - only for Anthropic */}
+                {editingProvider.npm === '@ai-sdk/anthropic' && (
+                  <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div className="space-y-0.5">
+                      <Label className="font-normal">启用缓存键</Label>
+                      <p className="text-xs text-muted-foreground">为 Anthropic 请求设置缓存键，启用上下文缓存</p>
+                    </div>
+                    <Switch
+                      checked={editingProvider.setCacheKey}
+                      onCheckedChange={(checked) => setEditingProvider({ ...editingProvider, setCacheKey: checked })}
+                    />
+                  </div>
+                )}
 
                 {/* Enterprise URL - only for github-copilot */}
                 {editingProvider.npm === '@ai-sdk/github-copilot' && (

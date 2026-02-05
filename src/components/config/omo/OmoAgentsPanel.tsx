@@ -4,6 +4,8 @@ import { ConfigCard } from '@/components/layout/Card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Select,
   SelectContent,
@@ -13,8 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Bot } from 'lucide-react';
-import { KNOWN_AGENTS } from '@/types/oh-my-opencode';
+import { Bot, ChevronDown, Brain } from 'lucide-react';
+import { KNOWN_AGENTS, CATEGORY_VARIANTS } from '@/types/oh-my-opencode';
 import { useOhMyOpenCodeStore } from '@/hooks/useOhMyOpenCode';
 import { useConfigStore } from '@/hooks/useConfig';
 
@@ -208,7 +210,84 @@ export function OmoAgentsPanel() {
                     disabled={!override?.model}
                   />
                 </div>
+
+                {/* 变体设置 */}
+                <div className="w-32">
+                  <Label className="text-xs text-muted-foreground">变体</Label>
+                  <Select
+                    value={override?.variant || '_default'}
+                    onValueChange={(value) => {
+                      if (override?.model) {
+                        updateAgentOverride(agent.id, {
+                          ...override,
+                          variant: value === '_default' ? undefined : value
+                        });
+                      }
+                    }}
+                    disabled={!override?.model}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="选择" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="_default">默认</SelectItem>
+                      {CATEGORY_VARIANTS.map((v) => (
+                        <SelectItem key={v} value={v}>{v}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
+
+              {/* 扩展思考配置 */}
+              {override?.model && (
+                <Collapsible>
+                  <CollapsibleTrigger className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                    <Brain className="h-3 w-3" />
+                    <span>扩展思考配置</span>
+                    <ChevronDown className="h-3 w-3" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-3 space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-background rounded-lg border">
+                      <div>
+                        <Label className="text-sm">启用扩展思考</Label>
+                        <p className="text-xs text-muted-foreground">让模型进行深度思考（仅 Claude 模型支持）</p>
+                      </div>
+                      <Switch
+                        checked={override?.thinking?.type === 'enabled'}
+                        onCheckedChange={(checked) => {
+                          updateAgentOverride(agent.id, {
+                            ...override,
+                            thinking: checked ? { type: 'enabled', budgetTokens: 10000 } : { type: 'disabled' }
+                          });
+                        }}
+                      />
+                    </div>
+                    {override?.thinking?.type === 'enabled' && (
+                      <div className="pl-3">
+                        <Label className="text-xs text-muted-foreground">思考预算 (Token 数)</Label>
+                        <Input
+                          className="mt-1"
+                          type="number"
+                          min="1000"
+                          step="1000"
+                          placeholder="10000"
+                          value={override?.thinking?.budgetTokens ?? 10000}
+                          onChange={(e) => {
+                            updateAgentOverride(agent.id, {
+                              ...override,
+                              thinking: {
+                                type: 'enabled',
+                                budgetTokens: e.target.value ? parseInt(e.target.value) : 10000
+                              }
+                            });
+                          }}
+                        />
+                      </div>
+                    )}
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
             </div>
           );
         })}

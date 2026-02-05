@@ -4,6 +4,9 @@ import { ConfigCard } from '@/components/layout/Card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Select,
   SelectContent,
@@ -13,10 +16,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Layers } from 'lucide-react';
+import { Layers, ChevronDown, Brain, Wrench } from 'lucide-react';
 import { KNOWN_CATEGORIES, CATEGORY_VARIANTS } from '@/types/oh-my-opencode';
 import { useOhMyOpenCodeStore } from '@/hooks/useOhMyOpenCode';
 import { useConfigStore } from '@/hooks/useConfig';
+import { TOOL_PERMISSIONS } from '@/types/config';
 
 // 变体中文名称映射
 const VARIANT_LABELS: Record<string, string> = {
@@ -221,7 +225,130 @@ export function OmoCategoriesPanel() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* 温度设置 */}
+                <div className="w-24">
+                  <Label className="text-xs text-muted-foreground">温度</Label>
+                  <Input
+                    className="mt-1"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="2"
+                    placeholder="0.7"
+                    value={categoryConfig?.temperature ?? ''}
+                    onChange={(e) => {
+                      if (categoryConfig?.model) {
+                        updateCategory(category.id, {
+                          ...categoryConfig,
+                          temperature: e.target.value ? parseFloat(e.target.value) : undefined
+                        });
+                      }
+                    }}
+                    disabled={!categoryConfig?.model}
+                  />
+                </div>
               </div>
+
+              {/* 高级配置区域 */}
+              {categoryConfig?.model && (
+                <div className="space-y-3 pt-2">
+                  {/* 提示追加 */}
+                  <div>
+                    <Label className="text-xs text-muted-foreground">提示追加</Label>
+                    <Textarea
+                      className="mt-1"
+                      placeholder="追加到系统提示的内容..."
+                      rows={2}
+                      value={categoryConfig?.prompt_append || ''}
+                      onChange={(e) => {
+                        updateCategory(category.id, {
+                          ...categoryConfig,
+                          prompt_append: e.target.value || undefined
+                        });
+                      }}
+                    />
+                  </div>
+
+                  {/* 扩展思考配置 */}
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                      <Brain className="h-3 w-3" />
+                      <span>扩展思考配置</span>
+                      <ChevronDown className="h-3 w-3" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pt-3 space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-background rounded-lg border">
+                        <div>
+                          <Label className="text-sm">启用扩展思考</Label>
+                          <p className="text-xs text-muted-foreground">让模型进行深度思考（仅 Claude 模型支持）</p>
+                        </div>
+                        <Switch
+                          checked={categoryConfig?.thinking?.type === 'enabled'}
+                          onCheckedChange={(checked) => {
+                            updateCategory(category.id, {
+                              ...categoryConfig,
+                              thinking: checked ? { type: 'enabled', budgetTokens: 10000 } : { type: 'disabled' }
+                            });
+                          }}
+                        />
+                      </div>
+                      {categoryConfig?.thinking?.type === 'enabled' && (
+                        <div className="pl-3">
+                          <Label className="text-xs text-muted-foreground">思考预算 (Token 数)</Label>
+                          <Input
+                            className="mt-1"
+                            type="number"
+                            min="1000"
+                            step="1000"
+                            placeholder="10000"
+                            value={categoryConfig?.thinking?.budgetTokens ?? 10000}
+                            onChange={(e) => {
+                              updateCategory(category.id, {
+                                ...categoryConfig,
+                                thinking: {
+                                  type: 'enabled',
+                                  budgetTokens: e.target.value ? parseInt(e.target.value) : 10000
+                                }
+                              });
+                            }}
+                          />
+                        </div>
+                      )}
+                    </CollapsibleContent>
+                  </Collapsible>
+
+                  {/* 工具启用配置 */}
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                      <Wrench className="h-3 w-3" />
+                      <span>工具启用配置</span>
+                      <ChevronDown className="h-3 w-3" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pt-3">
+                      <div className="grid grid-cols-4 gap-2">
+                        {TOOL_PERMISSIONS.map((tool) => (
+                          <div key={tool} className="flex items-center justify-between p-2 bg-background rounded border">
+                            <Label className="text-xs font-mono">{tool}</Label>
+                            <Switch
+                              checked={categoryConfig?.tools?.[tool] !== false}
+                              onCheckedChange={(checked) => {
+                                updateCategory(category.id, {
+                                  ...categoryConfig,
+                                  tools: {
+                                    ...categoryConfig?.tools,
+                                    [tool]: checked
+                                  }
+                                });
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
+              )}
             </div>
           );
         })}

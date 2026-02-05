@@ -4,20 +4,21 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Ban } from 'lucide-react';
-import { KNOWN_HOOKS, KNOWN_MCPS, KNOWN_DISABLED_AGENTS } from '@/lib/oh-my-opencode-defaults';
+import { KNOWN_HOOKS, KNOWN_MCPS, KNOWN_DISABLED_AGENTS, KNOWN_SKILLS } from '@/lib/oh-my-opencode-defaults';
 import { useOhMyOpenCodeStore } from '@/hooks/useOhMyOpenCode';
 
 export function OmoDisabledPanel() {
-  const { config, toggleDisabledHook, toggleDisabledAgent, toggleDisabledMcp } = useOhMyOpenCodeStore();
+  const { config, toggleDisabledHook, toggleDisabledAgent, toggleDisabledMcp, toggleDisabledSkill } = useOhMyOpenCodeStore();
 
   const totalDisabled = (config.disabled_hooks?.length || 0) +
     (config.disabled_agents?.length || 0) +
-    (config.disabled_mcps?.length || 0);
+    (config.disabled_mcps?.length || 0) +
+    (config.disabled_skills?.length || 0);
 
   return (
     <ConfigCard
       title="禁用功能"
-      description="管理禁用的 Hooks、Agents 和 MCPs"
+      description="管理禁用的 Hooks、Agents、MCPs 和 Skills"
       icon={Ban}
       badge={totalDisabled > 0 ? (
         <Badge variant="secondary">{totalDisabled} 个禁用</Badge>
@@ -75,6 +76,26 @@ export function OmoDisabledPanel() {
                 <Switch
                   checked={config.disabled_mcps?.includes(mcp.id) ?? false}
                   onCheckedChange={() => toggleDisabledMcp(mcp.id)}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Skills */}
+        <div>
+          <Label className="mb-2 block text-base font-semibold">禁用的 Skills</Label>
+          <p className="text-xs text-muted-foreground mb-2">禁用后，该技能将不会被代理加载</p>
+          <div className="space-y-2">
+            {KNOWN_SKILLS.map((skill) => (
+              <div key={skill.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
+                <div>
+                  <span className="font-medium">{skill.name}</span>
+                  <p className="text-xs text-muted-foreground">{skill.description}</p>
+                </div>
+                <Switch
+                  checked={config.disabled_skills?.includes(skill.id) ?? false}
+                  onCheckedChange={() => toggleDisabledSkill(skill.id)}
                 />
               </div>
             ))}

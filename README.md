@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.4-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.5-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
 
@@ -886,13 +886,19 @@ SOFTWARE.
 
 查看完整的版本更新历史和变更记录：**[CHANGELOG.md](CHANGELOG.md)**
 
-### 最新版本 v1.0.4 (2026-02-04)
+### 最新版本 v1.0.5 (2026-02-04)
+- ✨ **Oh My OpenCode 配置项完善** - 新增 agents.variant/thinking、categories.temperature/thinking/tools/prompt_append、background_task.modelConcurrency、disabled_skills
+- ✨ **KNOWN_AGENTS 扩展** - 新增 atlas、prometheus、sisyphus-junior、multimodal-looker、general、build、plan 等 7 个官方代理
+- ✨ **OpenCode 配置项完善** - 新增 provider.setCacheKey（Anthropic 缓存键）、lsp.initialization（LSP 初始化参数）
+- 📝 所有新增配置项均使用中文友好的标签和描述
+
+### v1.0.4 (2026-02-04)
 - ✨ **应用图标** - 为应用添加了专属图标（齿轮+代码符号设计）
 - 🐛 修复 macOS 构建签名问题（iCloud 同步目录导致的 codesign 错误）
 - 🐛 修复应用启动崩溃问题（ESM/CommonJS 模块冲突）
 - 📝 构建产物命名优化，包含系统和架构标识
 
-### v1.0.3 (2026-02-03)
+### v1.0.3 (2025-02-03)
 - ✨ **跨平台配置路径支持** - 所有平台统一使用 `~/.config/opencode/` 目录
 - ✨ **模型变体添加对话框** - 使用友好的对话框替代浏览器原生 prompt
 - 🐛 修复 Windows 系统无法正确加载配置的问题

@@ -35,6 +35,7 @@ interface OhMyOpenCodeState {
   toggleDisabledHook: (hookId: string) => void;
   toggleDisabledAgent: (agentId: string) => void;
   toggleDisabledMcp: (mcpId: string) => void;
+  toggleDisabledSkill: (skillId: string) => void;
 
   // Scope
   setConfigScope: (scope: 'global' | 'project') => void;
@@ -273,6 +274,18 @@ export const useOhMyOpenCodeStore = create<OhMyOpenCodeState>()(
           : [...disabled, mcpId];
         set({
           config: { ...config, disabled_mcps: newDisabled },
+          isDirty: true
+        });
+      },
+
+      toggleDisabledSkill: (skillId) => {
+        const { config } = get();
+        const disabled = config.disabled_skills || [];
+        const newDisabled = disabled.includes(skillId)
+          ? disabled.filter(id => id !== skillId)
+          : [...disabled, skillId];
+        set({
+          config: { ...config, disabled_skills: newDisabled },
           isDirty: true
         });
       },
