@@ -19,9 +19,9 @@ export interface OmocAgentPermission {
 }
 
 export interface OmocAgentModelOverride {
-  model: string;
+  model?: string;
   temperature?: number;
-  variant?: string;  // 模型变体，如 "max"
+  variant?: string;
   category?: string;
   skills?: string[];
   top_p?: number;
@@ -36,8 +36,8 @@ export interface OmocAgentModelOverride {
 }
 
 export interface OmocCategoryConfig {
-  model: string;
-  variant?: 'low' | 'medium' | 'high' | 'xhigh' | 'max';
+  model?: string;
+  variant?: string;
   temperature?: number;
   top_p?: number;
   maxTokens?: number;

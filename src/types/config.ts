@@ -11,6 +11,7 @@ export type PermissionValue = 'allow' | 'deny' | 'ask';
 export type PermissionRule = PermissionValue | Record<string, PermissionValue>;
 
 export type ToolPermissions = {
+  __originalKeys?: string[];
   read?: PermissionRule;
   edit?: PermissionRule;
   glob?: PermissionRule;
@@ -20,15 +21,18 @@ export type ToolPermissions = {
   task?: PermissionRule;
   skill?: PermissionRule;
   lsp?: PermissionRule;
-  todoread?: PermissionRule;
-  todowrite?: PermissionRule;
-  question?: PermissionRule;
-  webfetch?: PermissionRule;
-  websearch?: PermissionRule;
-  codesearch?: PermissionRule;
+  todoread?: PermissionValue;
+  todowrite?: PermissionValue;
+  question?: PermissionValue;
+  webfetch?: PermissionValue;
+  websearch?: PermissionValue;
+  codesearch?: PermissionValue;
   external_directory?: PermissionRule;
-  doom_loop?: PermissionRule;
+  doom_loop?: PermissionValue;
 };
+
+// Schema allows permission config to be either a full object or a single action.
+export type PermissionConfig = ToolPermissions | PermissionValue;
 
 // ============ Model Types ============
 export interface ModelThinkingOptions {
@@ -54,10 +58,14 @@ export interface ModelOptions {
 
   // Google
   thinkingLevel?: 'low' | 'high';
+
+  // Schema allows additional provider/model-specific keys
+  [key: string]: unknown;
 }
 
 // Model variant for different parameter presets (ctrl+t to cycle)
 export interface ModelVariant {
+  disabled?: boolean;
   reasoningEffort?: 'minimal' | 'low' | 'medium' | 'high' | 'xhigh';
   reasoningSummary?: 'auto' | 'detailed';
   textVerbosity?: 'low' | 'medium' | 'high';
@@ -65,17 +73,65 @@ export interface ModelVariant {
   thinkingLevel?: 'low' | 'high';
   include?: string[];
   store?: boolean;
+
+  // Schema allows additional provider/model-specific keys
+  [key: string]: unknown;
 }
 
 export interface ModelLimit {
   context?: number;
+  input?: number;
   output?: number;
 }
 
+export type ModelInterleavedConfig = true | {
+  field: 'reasoning_content' | 'reasoning_details';
+};
+
+export interface ModelCostOver200kConfig {
+  input?: number;
+  output?: number;
+  cache_read?: number;
+  cache_write?: number;
+}
+
+export interface ModelCostConfig {
+  input?: number;
+  output?: number;
+  cache_read?: number;
+  cache_write?: number;
+  context_over_200k?: ModelCostOver200kConfig;
+}
+
+export type ModelModality = 'text' | 'audio' | 'image' | 'video' | 'pdf';
+
+export interface ModelModalitiesConfig {
+  input: ModelModality[];
+  output: ModelModality[];
+}
+
+export interface ModelProviderOverride {
+  npm: string;
+}
+
 export interface ModelConfig {
+  id?: string;
   name?: string;
+  family?: string;
+  release_date?: string;
+  attachment?: boolean;
+  reasoning?: boolean;
+  temperature?: boolean;
+  tool_call?: boolean;
+  interleaved?: ModelInterleavedConfig;
+  cost?: ModelCostConfig;
   limit?: ModelLimit;
+  modalities?: ModelModalitiesConfig;
+  experimental?: boolean;
+  status?: 'alpha' | 'beta' | 'deprecated';
   options?: ModelOptions;
+  headers?: Record<string, string>;
+  provider?: ModelProviderOverride;
   variants?: Record<string, ModelVariant>;
 }
 
@@ -87,9 +143,14 @@ export interface ProviderOptions {
   timeout?: number | false;
   setCacheKey?: boolean;
   enterpriseUrl?: string;
+
+  // Schema allows additional provider-specific keys
+  [key: string]: unknown;
 }
 
 export interface ProviderConfig {
+  api?: string;
+  id?: string;
   npm?: string;  // e.g., "@ai-sdk/openai-compatible"
   name?: string;  // Display name
   env?: string[];
@@ -115,11 +176,7 @@ export type ProviderMap = Partial<Record<BuiltInProvider | string, ProviderConfi
 // ============ Agent Types ============
 export type AgentMode = 'primary' | 'subagent' | 'all';
 
-export interface AgentTools {
-  write?: boolean;
-  edit?: boolean;
-  bash?: boolean;
-}
+export type AgentTools = Record<string, boolean>;
 
 export interface AgentConfig {
   name?: string;
@@ -138,7 +195,7 @@ export interface AgentConfig {
   disable?: boolean;
   tools?: AgentTools;
   options?: Record<string, any>;
-  permission?: ToolPermissions;
+  permission?: PermissionConfig;
 }
 
 export type AgentMap = Record<string, AgentConfig>;
@@ -389,7 +446,7 @@ export interface OpenCodeConfig {
   agent?: AgentMap;
 
   // Global permissions
-  permission?: ToolPermissions;
+  permission?: PermissionConfig;
 
   // MCP servers
   mcp?: McpMap;
