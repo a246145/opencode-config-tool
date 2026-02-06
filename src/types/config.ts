@@ -131,6 +131,8 @@ export interface AgentConfig {
   temperature?: number;
   top_p?: number;
   steps?: number;
+  /** @deprecated Use 'steps' field instead */
+  maxSteps?: number;
   color?: string;  // hex color #RRGGBB
   hidden?: boolean;
   disable?: boolean;
@@ -200,6 +202,7 @@ export interface KeybindConfig {
   session_timeline?: string;
   session_fork?: string;
   session_rename?: string;
+  session_delete?: string;
   session_share?: string;
   session_unshare?: string;
   session_interrupt?: string;
@@ -207,6 +210,12 @@ export interface KeybindConfig {
   session_child_cycle?: string;
   session_child_cycle_reverse?: string;
   session_parent?: string;
+
+  // Stash
+  stash_delete?: string;
+
+  // Display
+  display_thinking?: string;
 
   // Messages
   messages_page_up?: string;
@@ -231,6 +240,8 @@ export interface KeybindConfig {
   model_cycle_recent_reverse?: string;
   model_cycle_favorite?: string;
   model_cycle_favorite_reverse?: string;
+  model_provider_list?: string;
+  model_favorite_toggle?: string;
   variant_cycle?: string;
 
   // Command/Agent
@@ -478,10 +489,11 @@ export const DEFAULT_CONFIG: OpenCodeConfig = {
 
 // ============ Keybind Categories ============
 export const KEYBIND_CATEGORIES = {
-  application: ['app_exit', 'editor_open', 'theme_list', 'sidebar_toggle', 'scrollbar_toggle', 'username_toggle', 'status_view', 'tool_details'],
-  session: ['session_export', 'session_new', 'session_list', 'session_timeline', 'session_fork', 'session_rename', 'session_share', 'session_unshare', 'session_interrupt', 'session_compact', 'session_child_cycle', 'session_child_cycle_reverse', 'session_parent'],
+  application: ['app_exit', 'editor_open', 'theme_list', 'sidebar_toggle', 'scrollbar_toggle', 'username_toggle', 'status_view', 'tool_details', 'display_thinking'],
+  session: ['session_export', 'session_new', 'session_list', 'session_timeline', 'session_fork', 'session_rename', 'session_delete', 'session_share', 'session_unshare', 'session_interrupt', 'session_compact', 'session_child_cycle', 'session_child_cycle_reverse', 'session_parent'],
+  stash: ['stash_delete'],
   messages: ['messages_page_up', 'messages_page_down', 'messages_line_up', 'messages_line_down', 'messages_half_page_up', 'messages_half_page_down', 'messages_first', 'messages_last', 'messages_next', 'messages_previous', 'messages_copy', 'messages_undo', 'messages_redo', 'messages_last_user', 'messages_toggle_conceal'],
-  model: ['model_list', 'model_cycle_recent', 'model_cycle_recent_reverse', 'model_cycle_favorite', 'model_cycle_favorite_reverse', 'variant_cycle'],
+  model: ['model_list', 'model_cycle_recent', 'model_cycle_recent_reverse', 'model_cycle_favorite', 'model_cycle_favorite_reverse', 'model_provider_list', 'model_favorite_toggle', 'variant_cycle'],
   command: ['command_list', 'agent_list', 'agent_cycle', 'agent_cycle_reverse'],
   input: ['input_clear', 'input_paste', 'input_submit', 'input_newline', 'input_move_left', 'input_move_right', 'input_move_up', 'input_move_down', 'input_select_left', 'input_select_right', 'input_select_up', 'input_select_down', 'input_line_home', 'input_line_end', 'input_select_line_home', 'input_select_line_end', 'input_visual_line_home', 'input_visual_line_end', 'input_select_visual_line_home', 'input_select_visual_line_end', 'input_buffer_home', 'input_buffer_end', 'input_select_buffer_home', 'input_select_buffer_end', 'input_delete_line', 'input_delete_to_line_end', 'input_delete_to_line_start', 'input_backspace', 'input_delete', 'input_undo', 'input_redo', 'input_word_forward', 'input_word_backward', 'input_select_word_forward', 'input_select_word_backward', 'input_delete_word_forward', 'input_delete_word_backward'],
   history: ['history_previous', 'history_next'],

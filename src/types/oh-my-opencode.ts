@@ -202,26 +202,25 @@ export interface OmocInstallOptions {
 
 // 已知的 Agent 列表（带中文名称和描述）
 export const KNOWN_AGENTS = [
+  // oh-my-opencode schema 定义的代理
+  { id: 'build', name: '构建代理', description: '默认代理，基于权限执行工具' },
+  { id: 'plan', name: '规划代理', description: '规划模式，禁用所有编辑工具' },
+  { id: 'sisyphus', name: '西西弗斯', description: '持久化任务执行' },
+  { id: 'sisyphus-junior', name: '小西西弗斯', description: '专注任务执行者，无委派能力' },
+  { id: 'OpenCode-Builder', name: 'OpenCode 构建器', description: '专用构建代理' },
+  { id: 'prometheus', name: '普罗米修斯', description: '规划代理，任务分解和策略制定' },
+  { id: 'metis', name: '墨提斯', description: '智慧代理，策略分析和决策支持' },
+  { id: 'momus', name: '摩墨斯', description: '审查代理，代码审查和质量检测' },
   { id: 'oracle', name: '神谕者', description: '高智商推理专家，架构设计和复杂调试' },
   { id: 'librarian', name: '图书管理员', description: '文档查询和知识检索' },
   { id: 'explore', name: '探索者', description: '代码库探索和上下文搜索' },
-  { id: 'atlas', name: '阿特拉斯', description: '任务编排和多代理协调' },
-  { id: 'prometheus', name: '普罗米修斯', description: '规划代理，任务分解和策略制定' },
-  { id: 'sisyphus-junior', name: '小西西弗斯', description: '专注任务执行者，无委派能力' },
   { id: 'multimodal-looker', name: '多模态观察者', description: '图像分析和视觉处理' },
+  { id: 'atlas', name: '阿特拉斯', description: '任务编排和多代理协调' },
+  // opencode schema 额外定义的代理
   { id: 'general', name: '通用代理', description: '通用任务执行和多步骤操作' },
-  { id: 'build', name: '构建代理', description: '默认代理，基于权限执行工具' },
-  { id: 'plan', name: '规划代理', description: '规划模式，禁用所有编辑工具' },
-  { id: 'Sisyphus', name: '西西弗斯', description: '持久化任务执行' },
-  { id: 'architect', name: '架构师', description: '系统设计和架构规划' },
-  { id: 'executor', name: '执行者', description: '代码执行和任务完成' },
-  { id: 'designer', name: '设计师', description: 'UI/UX 设计和前端开发' },
-  { id: 'writer', name: '写作者', description: '文档编写和内容创作' },
-  { id: 'analyst', name: '分析师', description: '数据分析和问题诊断' },
-  { id: 'researcher', name: '研究员', description: '深度研究和信息收集' },
-  { id: 'scientist', name: '科学家', description: '数据科学和实验分析' },
-  { id: 'vision', name: '视觉专家', description: '图像分析和视觉处理' },
-  { id: 'planner', name: '规划师', description: '任务规划和策略制定' },
+  { id: 'title', name: '标题代理', description: '会话标题生成' },
+  { id: 'summary', name: '摘要代理', description: '会话摘要生成' },
+  { id: 'compaction', name: '压缩代理', description: '会话上下文压缩' },
 ] as const;
 
 // 已知的 Category 列表（带中文名称和描述）

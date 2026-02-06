@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.6-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.7-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
 
@@ -886,7 +886,14 @@ SOFTWARE.
 
 查看完整的版本更新历史和变更记录：**[CHANGELOG.md](CHANGELOG.md)**
 
-### 最新版本 v1.0.6 (2026-02-05)
+### 最新版本 v1.0.7 (2026-02-06)
+- 🐛 **Schema 配置项完整对齐** - 补齐 5 个缺失快捷键、修正默认值、AgentConfig 补齐 maxSteps
+- 📝 KNOWN_HOOKS 从 4 个扩展到 30 个（完整覆盖 Schema 枚举）
+- 📝 KNOWN_DISABLED_AGENTS 从 2 个扩展到 9 个（完整覆盖 Schema 枚举）
+- 📝 KNOWN_AGENTS 重构为 17 个（精确对齐双 Schema 定义）
+- 📝 KEYBIND_CATEGORIES 新增 stash 分类及 5 个新快捷键
+
+### v1.0.6 (2026-02-05)
 - ✨ **模型列表动态获取** - 通过 `opencode models` 命令实时获取可用模型列表（GUI + WebUI 双模式）
 - 🐛 修复 Electron GUI 模式模型列表为空的问题（preload 缺少 IPC 通道）
 - 🐛 修复 WebUI 模式模型列表获取失败（Vite 未代理 API 请求）

@@ -17,6 +17,27 @@
 
 ---
 
+## [1.0.7] - 2026-02-06
+
+### 修复
+- 🐛 **快捷键配置项补齐**：新增 5 个 Schema 中定义但项目中缺失的快捷键字段
+  - `display_thinking` - 切换思考块显示（默认: none）
+  - `session_delete` - 删除会话（默认: ctrl+d）
+  - `stash_delete` - 删除暂存条目（默认: ctrl+d）
+  - `model_provider_list` - 从模型对话框打开 Provider 列表（默认: ctrl+a）
+  - `model_favorite_toggle` - 切换模型收藏状态（默认: ctrl+f）
+- 🐛 **修正 `session_rename` 默认值**：从 `none` 修正为 `ctrl+r`（与 Schema 定义一致）
+- 🐛 **AgentConfig 补齐 `maxSteps` 字段**：添加已弃用的 `maxSteps` 字段（Schema 兼容）
+
+### 改进
+- 📝 **KNOWN_HOOKS 完整对齐 Schema**：从 4 个扩展到 30 个，完整覆盖 oh-my-opencode schema 的 `disabled_hooks` 枚举；移除 2 个非 Schema 值（`delegation-audit`、`path-write-guard`）
+- 📝 **KNOWN_DISABLED_AGENTS 完整对齐 Schema**：从 2 个扩展到 9 个，完整覆盖 oh-my-opencode schema 的 `disabled_agents` 枚举（`sisyphus`、`prometheus`、`oracle`、`librarian`、`explore`、`multimodal-looker`、`metis`、`momus`、`atlas`）；移除非 Schema 值 `vision`
+- 📝 **KNOWN_AGENTS 重构对齐双 Schema**：从 20 个重构为 17 个，精确对齐 oh-my-opencode 和 opencode 两个 Schema 的代理定义；新增 `metis`（墨提斯）、`momus`（摩墨斯）、`OpenCode-Builder`、`title`、`summary`、`compaction`；移除 7 个非 Schema 代理
+- 📝 **KEYBIND_CATEGORIES 更新**：新增 `stash` 分类；`application` 分类新增 `display_thinking`；`session` 分类新增 `session_delete`；`model` 分类新增 `model_provider_list`、`model_favorite_toggle`
+- 📝 **KNOWN_SKILLS 排序对齐 Schema**：前 3 个与 Schema `disabled_skills` 枚举对齐
+
+---
+
 ## [1.0.6] - 2026-02-05
 
 ### 新增
@@ -266,7 +287,8 @@
 
 ---
 
-[未发布]: https://github.com/a246145/opencode-config-tool/compare/v1.0.6...HEAD
+[未发布]: https://github.com/a246145/opencode-config-tool/compare/v1.0.7...HEAD
+[1.0.7]: https://github.com/a246145/opencode-config-tool/compare/v1.0.6...v1.0.7
 [1.0.6]: https://github.com/a246145/opencode-config-tool/compare/v1.0.5...v1.0.6
 [1.0.5]: https://github.com/a246145/opencode-config-tool/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/a246145/opencode-config-tool/compare/v1.0.3...v1.0.4
