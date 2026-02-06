@@ -28,12 +28,13 @@ export function OtherSettings() {
             </div>
             <Select
               value={config.share || 'auto'}
-              onValueChange={(value: 'auto' | 'disabled') => updateConfig({ share: value })}
+              onValueChange={(value: 'manual' | 'auto' | 'disabled') => updateConfig({ share: value })}
             >
               <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="manual">手动</SelectItem>
                 <SelectItem value="auto">自动</SelectItem>
                 <SelectItem value="disabled">禁用</SelectItem>
               </SelectContent>

@@ -45,6 +45,18 @@ export function OmoSisyphusPanel() {
         </div>
         <div className="flex items-center justify-between">
           <div>
+            <Label>默认 Builder</Label>
+            <p className="text-xs text-muted-foreground">启用默认构建代理</p>
+          </div>
+          <Switch
+            checked={config.sisyphus_agent?.default_builder_enabled ?? false}
+            onCheckedChange={(checked) => updateConfig({
+              sisyphus_agent: { ...config.sisyphus_agent, default_builder_enabled: checked }
+            })}
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <div>
             <Label>替换规划</Label>
             <p className="text-xs text-muted-foreground">允许替换现有规划</p>
           </div>

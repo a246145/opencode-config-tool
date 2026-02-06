@@ -44,3 +44,4 @@ Thumbs.db
 .env.local
 .env.*.local
 CLAUDE.md
+package-lock.json

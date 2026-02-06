@@ -17,6 +17,30 @@
 
 ---
 
+## [1.0.6] - 2026-02-05
+
+### 新增
+- ✨ **模型列表动态获取**：通过 `opencode models` 命令实时获取可用模型列表
+  - Electron GUI 模式：通过 IPC 调用获取
+  - WebUI 浏览器模式：通过 `/api/models` API 端点获取
+  - 新增 `useOpencodeModels` Hook 统一管理模型数据
+  - 新增 `server/routes/models.ts` 后端路由
+- ✨ **JSON Schema 验证支持**：新增 `schema/` 目录
+  - `opencode.schema.json` - OpenCode 配置 Schema
+  - `oh-my-opencode.schema.json` - Oh My OpenCode 配置 Schema
+
+### 修复
+- 🐛 **修复 Electron GUI 模式模型列表为空**：preload.cjs 缺少 `getOpencodeModels` IPC 通道暴露
+- 🐛 **修复 WebUI 模式模型列表获取失败**：Vite 开发服务器未代理 `/api/*` 请求到后端
+- 🐛 **修复 `opencode` 命令找不到**：`~/.opencode/bin` 未加入 PATH 环境变量
+  - 同时修复 Electron (`electron/ipc/file.ts`) 和 WebUI (`server/routes/models.ts`) 两端
+
+### 改进
+- 📝 **Vite 代理配置**：开发模式下自动将 `/api/*` 请求代理到 `localhost:3001`
+- 📝 **PATH 环境变量增强**：自动包含 `~/.opencode/bin` 路径，兼容 opencode 默认安装位置
+
+---
+
 ## [1.0.5] - 2026-02-04
 
 ### 新增
@@ -242,7 +266,8 @@
 
 ---
 
-[未发布]: https://github.com/a246145/opencode-config-tool/compare/v1.0.5...HEAD
+[未发布]: https://github.com/a246145/opencode-config-tool/compare/v1.0.6...HEAD
+[1.0.6]: https://github.com/a246145/opencode-config-tool/compare/v1.0.5...v1.0.6
 [1.0.5]: https://github.com/a246145/opencode-config-tool/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/a246145/opencode-config-tool/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/a246145/opencode-config-tool/compare/v1.0.2...v1.0.3

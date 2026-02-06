@@ -1,10 +1,11 @@
 // src/components/config/omo/OmoAgentsPanel.tsx
-import { useMemo } from 'react';
+import { useState } from 'react';
 import { ConfigCard } from '@/components/layout/Card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Select,
@@ -18,95 +19,15 @@ import {
 import { Bot, ChevronDown, Brain } from 'lucide-react';
 import { KNOWN_AGENTS, CATEGORY_VARIANTS } from '@/types/oh-my-opencode';
 import { useOhMyOpenCodeStore } from '@/hooks/useOhMyOpenCode';
-import { useConfigStore } from '@/hooks/useConfig';
-
-// 内置提供商的默认模型
-const DEFAULT_PROVIDER_MODELS: Record<string, { id: string; name: string }[]> = {
-  anthropic: [
-    { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4' },
-    { id: 'claude-opus-4-20250514', name: 'Claude Opus 4' },
-    { id: 'claude-haiku-4-20250514', name: 'Claude Haiku 4' },
-  ],
-  openai: [
-    { id: 'gpt-4o', name: 'GPT-4o' },
-    { id: 'gpt-4-turbo', name: 'GPT-4 Turbo' },
-    { id: 'o1-preview', name: 'o1-preview' },
-  ],
-  google: [
-    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
-    { id: 'gemini-pro', name: 'Gemini Pro' },
-  ],
-  groq: [
-    { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B' },
-  ],
-  xai: [
-    { id: 'grok-2', name: 'Grok 2' },
-  ],
-};
+import { useOpencodeModels } from '@/hooks/useOpencodeModels';
+import { TOOL_PERMISSIONS } from '@/types/config';
 
 export function OmoAgentsPanel() {
   const { config, updateAgentOverride } = useOhMyOpenCodeStore();
-  const { config: openCodeConfig } = useConfigStore();
+  const { modelsByProvider, isLoading, error } = useOpencodeModels();
+  const [jsonErrors, setJsonErrors] = useState<Record<string, string | null>>({});
 
-  // 从 OpenCode 配置中获取可用模型
-  const availableModels = useMemo(() => {
-    const models: { providerId: string; providerName: string; modelId: string; modelName: string; fullId: string }[] = [];
-    const providers = openCodeConfig.provider || {};
-
-    Object.entries(providers).forEach(([providerId, providerConfig]) => {
-      if (!providerConfig) return;
-
-      const providerName = providerConfig.name || providerId;
-
-      if (providerConfig.models && Object.keys(providerConfig.models).length > 0) {
-        Object.entries(providerConfig.models).forEach(([modelId, modelConfig]) => {
-          models.push({
-            providerId,
-            providerName,
-            modelId,
-            modelName: modelConfig?.name || modelId,
-            fullId: `${providerId}/${modelId}`,
-          });
-        });
-      } else if (providerConfig.whitelist && providerConfig.whitelist.length > 0) {
-        providerConfig.whitelist.forEach((modelId) => {
-          models.push({
-            providerId,
-            providerName,
-            modelId,
-            modelName: modelId,
-            fullId: `${providerId}/${modelId}`,
-          });
-        });
-      } else if (DEFAULT_PROVIDER_MODELS[providerId]) {
-        DEFAULT_PROVIDER_MODELS[providerId].forEach((model) => {
-          models.push({
-            providerId,
-            providerName,
-            modelId: model.id,
-            modelName: model.name,
-            fullId: `${providerId}/${model.id}`,
-          });
-        });
-      }
-    });
-
-    return models;
-  }, [openCodeConfig.provider]);
-
-  // 按提供商分组
-  const modelsByProvider = useMemo(() => {
-    const grouped: Record<string, typeof availableModels> = {};
-    availableModels.forEach((model) => {
-      if (!grouped[model.providerId]) {
-        grouped[model.providerId] = [];
-      }
-      grouped[model.providerId].push(model);
-    });
-    return grouped;
-  }, [availableModels]);
-
-  const hasConfiguredProviders = Object.keys(modelsByProvider).length > 0;
+  const hasAvailableModels = Object.keys(modelsByProvider).length > 0;
 
   return (
     <ConfigCard
@@ -138,7 +59,7 @@ export function OmoAgentsPanel() {
                 {/* 模型选择 */}
                 <div className="flex-1">
                   <Label className="text-xs text-muted-foreground">模型</Label>
-                  {hasConfiguredProviders ? (
+                  {hasAvailableModels ? (
                     <Select
                       value={override?.model || '_none'}
                       onValueChange={(value) => {
@@ -154,17 +75,17 @@ export function OmoAgentsPanel() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="_none">不覆盖（使用默认）</SelectItem>
-                        {Object.entries(modelsByProvider).map(([providerId, models]) => (
-                          <SelectGroup key={providerId}>
-                            <SelectLabel className="flex items-center gap-2 text-xs font-semibold text-primary bg-muted/50 px-2 py-1.5 -mx-1 rounded">
-                              <span className="w-2 h-2 rounded-full bg-primary"></span>
-                              {models[0]?.providerName || providerId}
-                            </SelectLabel>
-                            {models.map((model) => (
-                              <SelectItem key={model.fullId} value={model.fullId} className="pl-6">
-                                {model.modelName}
-                                <span className="ml-2 text-xs text-muted-foreground font-mono">
-                                  {model.modelId}
+                            {Object.entries(modelsByProvider).map(([providerId, models]) => (
+                              <SelectGroup key={providerId}>
+                                <SelectLabel className="flex items-center gap-2 text-xs font-semibold text-primary bg-muted/50 px-2 py-1.5 -mx-1 rounded">
+                                  <span className="w-2 h-2 rounded-full bg-primary"></span>
+                                  {providerId}
+                                </SelectLabel>
+                                {models.map((model) => (
+                                  <SelectItem key={model.fullId} value={model.fullId} className="pl-6">
+                                    {model.modelName}
+                                    <span className="ml-2 text-xs text-muted-foreground font-mono">
+                                      {model.modelId}
                                 </span>
                               </SelectItem>
                             ))}
@@ -173,18 +94,24 @@ export function OmoAgentsPanel() {
                       </SelectContent>
                     </Select>
                   ) : (
-                    <Input
-                      className="mt-1"
-                      placeholder="模型 ID (如 anthropic/claude-opus-4-5)"
-                      value={override?.model || ''}
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          updateAgentOverride(agent.id, { ...override, model: e.target.value });
-                        } else {
-                          updateAgentOverride(agent.id, null);
-                        }
-                      }}
-                    />
+                    <div className="space-y-2">
+                      <Input
+                        className="mt-1"
+                        placeholder="模型 ID (如 anthropic/claude-opus-4-5)"
+                        value={override?.model || ''}
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            updateAgentOverride(agent.id, { ...override, model: e.target.value });
+                          } else {
+                            updateAgentOverride(agent.id, null);
+                          }
+                        }}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        {isLoading ? '正在加载模型列表...' : '请确认可执行 `opencode models`'}
+                      </p>
+                      {error && <p className="text-xs text-destructive">{error}</p>}
+                    </div>
                   )}
                 </div>
 
@@ -239,52 +166,218 @@ export function OmoAgentsPanel() {
                 </div>
               </div>
 
-              {/* 扩展思考配置 */}
+              {/* 高级配置 */}
               {override?.model && (
                 <Collapsible>
                   <CollapsibleTrigger className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
                     <Brain className="h-3 w-3" />
-                    <span>扩展思考配置</span>
+                    <span>高级配置</span>
                     <ChevronDown className="h-3 w-3" />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="pt-3 space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-background rounded-lg border">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-sm">启用扩展思考</Label>
-                        <p className="text-xs text-muted-foreground">让模型进行深度思考（仅 Claude 模型支持）</p>
-                      </div>
-                      <Switch
-                        checked={override?.thinking?.type === 'enabled'}
-                        onCheckedChange={(checked) => {
-                          updateAgentOverride(agent.id, {
-                            ...override,
-                            thinking: checked ? { type: 'enabled', budgetTokens: 10000 } : { type: 'disabled' }
-                          });
-                        }}
-                      />
-                    </div>
-                    {override?.thinking?.type === 'enabled' && (
-                      <div className="pl-3">
-                        <Label className="text-xs text-muted-foreground">思考预算 (Token 数)</Label>
+                        <Label className="text-xs text-muted-foreground">Top P</Label>
                         <Input
                           className="mt-1"
                           type="number"
-                          min="1000"
-                          step="1000"
-                          placeholder="10000"
-                          value={override?.thinking?.budgetTokens ?? 10000}
+                          step="0.1"
+                          min="0"
+                          max="1"
+                          placeholder="0.9"
+                          value={override?.top_p ?? ''}
                           onChange={(e) => {
                             updateAgentOverride(agent.id, {
                               ...override,
-                              thinking: {
-                                type: 'enabled',
-                                budgetTokens: e.target.value ? parseInt(e.target.value) : 10000
-                              }
+                              top_p: e.target.value ? parseFloat(e.target.value) : undefined
                             });
                           }}
                         />
                       </div>
-                    )}
+                      <div>
+                        <Label className="text-xs text-muted-foreground">分类</Label>
+                        <Input
+                          className="mt-1"
+                          placeholder="quick"
+                          value={override?.category || ''}
+                          onChange={(e) => {
+                            updateAgentOverride(agent.id, {
+                              ...override,
+                              category: e.target.value || undefined
+                            });
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-xs text-muted-foreground">模式</Label>
+                        <Select
+                          value={override?.mode || '_default'}
+                          onValueChange={(value) => {
+                            if (value === '_default') {
+                              updateAgentOverride(agent.id, { ...override, mode: undefined });
+                              return;
+                            }
+                            if (['subagent', 'primary', 'all'].includes(value)) {
+                              updateAgentOverride(agent.id, { ...override, mode: value as 'subagent' | 'primary' | 'all' });
+                            }
+                          }}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="默认" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="_default">默认</SelectItem>
+                            <SelectItem value="subagent">subagent</SelectItem>
+                            <SelectItem value="primary">primary</SelectItem>
+                            <SelectItem value="all">all</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground">颜色</Label>
+                        <Input
+                          className="mt-1"
+                          placeholder="#FF5733"
+                          value={override?.color || ''}
+                          onChange={(e) => {
+                            updateAgentOverride(agent.id, {
+                              ...override,
+                              color: e.target.value || undefined
+                            });
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">描述</Label>
+                      <Input
+                        className="mt-1"
+                        placeholder="代理描述"
+                        value={override?.description || ''}
+                        onChange={(e) => {
+                          updateAgentOverride(agent.id, {
+                            ...override,
+                            description: e.target.value || undefined
+                          });
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">提示词</Label>
+                      <Textarea
+                        className="mt-1"
+                        rows={2}
+                        placeholder="自定义提示词..."
+                        value={override?.prompt || ''}
+                        onChange={(e) => {
+                          updateAgentOverride(agent.id, {
+                            ...override,
+                            prompt: e.target.value || undefined
+                          });
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">提示词追加</Label>
+                      <Textarea
+                        className="mt-1"
+                        rows={2}
+                        placeholder="追加到系统提示的内容..."
+                        value={override?.prompt_append || ''}
+                        onChange={(e) => {
+                          updateAgentOverride(agent.id, {
+                            ...override,
+                            prompt_append: e.target.value || undefined
+                          });
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">技能列表 (逗号分隔)</Label>
+                      <Input
+                        className="mt-1"
+                        placeholder="frontend-ui-ux, git-master"
+                        value={(override?.skills || []).join(', ')}
+                        onChange={(e) => {
+                          const value = e.target.value
+                            .split(',')
+                            .map((item) => item.trim())
+                            .filter(Boolean);
+                          updateAgentOverride(agent.id, {
+                            ...override,
+                            skills: value.length > 0 ? value : undefined
+                          });
+                        }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-background rounded-lg border">
+                      <div>
+                        <Label className="text-sm">禁用该 Agent</Label>
+                        <p className="text-xs text-muted-foreground">在 OMO 中禁用该代理</p>
+                      </div>
+                      <Switch
+                        checked={override?.disable ?? false}
+                        onCheckedChange={(checked) => {
+                          updateAgentOverride(agent.id, {
+                            ...override,
+                            disable: checked
+                          });
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">权限配置 (JSON)</Label>
+                      <Textarea
+                        className="mt-1 font-mono text-xs"
+                        rows={3}
+                        value={override?.permission ? JSON.stringify(override.permission, null, 2) : ''}
+                        onChange={(e) => {
+                          const raw = e.target.value;
+                          if (!raw) {
+                            setJsonErrors((prev) => ({ ...prev, [agent.id]: null }));
+                            updateAgentOverride(agent.id, { ...override, permission: undefined });
+                            return;
+                          }
+                          try {
+                            const parsed = JSON.parse(raw);
+                            setJsonErrors((prev) => ({ ...prev, [agent.id]: null }));
+                            updateAgentOverride(agent.id, { ...override, permission: parsed });
+                          } catch (parseError) {
+                            setJsonErrors((prev) => ({
+                              ...prev,
+                              [agent.id]: parseError instanceof Error ? parseError.message : '无效 JSON'
+                            }));
+                          }
+                        }}
+                      />
+                      {jsonErrors[agent.id] && (
+                        <p className="mt-1 text-xs text-destructive">{jsonErrors[agent.id]}</p>
+                      )}
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">工具配置</Label>
+                      <div className="mt-2 grid grid-cols-4 gap-2">
+                        {TOOL_PERMISSIONS.map((tool) => (
+                          <div key={tool} className="flex items-center justify-between p-2 bg-background rounded border">
+                            <Label className="text-xs font-mono">{tool}</Label>
+                            <Switch
+                              checked={override?.tools?.[tool] !== false}
+                              onCheckedChange={(checked) => {
+                                updateAgentOverride(agent.id, {
+                                  ...override,
+                                  tools: {
+                                    ...override.tools,
+                                    [tool]: checked
+                                  }
+                                });
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </CollapsibleContent>
                 </Collapsible>
               )}

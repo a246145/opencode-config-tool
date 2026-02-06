@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   writeFile: (path: string, content: string) => ipcRenderer.invoke('write-file', path, content),
   openFileDialog: () => ipcRenderer.invoke('open-file-dialog'),
   saveFileDialog: (defaultPath?: string) => ipcRenderer.invoke('save-file-dialog', defaultPath),
+  getOpencodeModels: (provider?: string) => ipcRenderer.invoke('opencode-models', provider),
 
   // 平台信息
   platform: process.platform,
@@ -22,6 +23,7 @@ declare global {
       writeFile: (path: string, content: string) => Promise<boolean>;
       openFileDialog: () => Promise<string | null>;
       saveFileDialog: (defaultPath?: string) => Promise<string | null>;
+      getOpencodeModels: (provider?: string) => Promise<string>;
       platform: string;
       isElectron: boolean;
     };

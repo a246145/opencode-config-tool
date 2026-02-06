@@ -22,6 +22,7 @@ export type ToolPermissions = {
   lsp?: PermissionRule;
   todoread?: PermissionRule;
   todowrite?: PermissionRule;
+  question?: PermissionRule;
   webfetch?: PermissionRule;
   websearch?: PermissionRule;
   codesearch?: PermissionRule;
@@ -139,6 +140,16 @@ export interface AgentConfig {
 }
 
 export type AgentMap = Record<string, AgentConfig>;
+
+export interface CommandConfig {
+  template: string;
+  description?: string;
+  agent?: string;
+  model?: string;
+  subtask?: boolean;
+}
+
+export type CommandMap = Record<string, CommandConfig>;
 
 // ============ MCP Server Types ============
 export interface McpOAuthConfig {
@@ -414,6 +425,18 @@ export interface OpenCodeConfig {
   // Share setting
   share?: ShareSetting;
 
+  // Deprecated fields
+  autoshare?: boolean;
+  layout?: 'auto' | 'stretch';
+  tools?: Record<string, boolean>;
+  mode?: AgentMap;
+
+  // Command config
+  command?: CommandMap;
+
+  // Log level
+  logLevel?: 'DEBUG' | 'INFO' | 'WARN' | 'ERROR';
+
   // Auto update
   autoupdate?: boolean | 'notify';
 
@@ -468,7 +491,7 @@ export const KEYBIND_CATEGORIES = {
 // ============ Tool Permission List ============
 export const TOOL_PERMISSIONS = [
   'read', 'edit', 'glob', 'grep', 'list', 'bash', 'task', 'skill', 'lsp',
-  'todoread', 'todowrite', 'webfetch', 'websearch', 'codesearch',
+  'todoread', 'todowrite', 'question', 'webfetch', 'websearch', 'codesearch',
   'external_directory', 'doom_loop'
 ] as const;
 
@@ -486,4 +509,3 @@ export const BUILTIN_LSP_SERVERS = [
 export const DIFF_STYLES = ['auto', 'stacked'] as const;
 export const SHARE_OPTIONS = ['manual', 'auto', 'disabled'] as const;
 export const AGENT_MODES = ['primary', 'subagent', 'all'] as const;
-

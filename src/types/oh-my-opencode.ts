@@ -6,11 +6,33 @@ export interface OmocThinkingConfig {
   budgetTokens?: number;
 }
 
+export type OmocPermissionValue = 'allow' | 'deny' | 'ask';
+
+export type OmocPermissionRule = OmocPermissionValue | Record<string, OmocPermissionValue>;
+
+export interface OmocAgentPermission {
+  edit?: OmocPermissionValue;
+  bash?: OmocPermissionRule;
+  webfetch?: OmocPermissionValue;
+  doom_loop?: OmocPermissionValue;
+  external_directory?: OmocPermissionValue;
+}
+
 export interface OmocAgentModelOverride {
   model: string;
   temperature?: number;
   variant?: string;  // 模型变体，如 "max"
-  thinking?: OmocThinkingConfig;
+  category?: string;
+  skills?: string[];
+  top_p?: number;
+  prompt?: string;
+  prompt_append?: string;
+  tools?: Record<string, boolean>;
+  disable?: boolean;
+  description?: string;
+  mode?: 'subagent' | 'primary' | 'all';
+  color?: string;
+  permission?: OmocAgentPermission;
 }
 
 export interface OmocCategoryConfig {
@@ -18,10 +40,14 @@ export interface OmocCategoryConfig {
   variant?: 'low' | 'medium' | 'high' | 'xhigh' | 'max';
   temperature?: number;
   top_p?: number;
+  maxTokens?: number;
+  reasoningEffort?: 'low' | 'medium' | 'high' | 'xhigh';
+  textVerbosity?: 'low' | 'medium' | 'high';
   prompt_append?: string;  // 追加到系统提示的内容
   description?: string;    // 分类描述
   thinking?: OmocThinkingConfig;
   tools?: Record<string, boolean>;  // 工具启用/禁用配置
+  is_unstable_agent?: boolean;
 }
 
 export interface OmocBackgroundTaskConfig {
@@ -39,6 +65,7 @@ export interface OmocTmuxConfig {
 
 export interface OmocSisyphusConfig {
   disabled?: boolean;
+  default_builder_enabled?: boolean;
   planner_enabled?: boolean;
   replace_plan?: boolean;
 }
@@ -50,10 +77,87 @@ export interface OmocClaudeCodeConfig {
   agents?: boolean;
   hooks?: boolean;
   plugins?: boolean;
+  plugins_override?: Record<string, boolean>;
 }
 
 export interface OmocExperimentalConfig {
   aggressive_truncation?: boolean;
+  auto_resume?: boolean;
+  truncate_all_tool_outputs?: boolean;
+  dynamic_context_pruning?: {
+    enabled?: boolean;
+    notification?: 'off' | 'minimal' | 'detailed';
+    turn_protection?: {
+      enabled?: boolean;
+      turns?: number;
+    };
+    protected_tools?: string[];
+    strategies?: {
+      deduplication?: {
+        enabled?: boolean;
+      };
+      supersede_writes?: {
+        enabled?: boolean;
+        aggressive?: boolean;
+      };
+      purge_errors?: {
+        enabled?: boolean;
+        turns?: number;
+      };
+    };
+  };
+}
+
+export interface OmocCommentCheckerConfig {
+  custom_prompt?: string;
+}
+
+export interface OmocGitMasterConfig {
+  commit_footer?: boolean;
+  include_co_authored_by?: boolean;
+}
+
+export interface OmocNotificationConfig {
+  force_enable?: boolean;
+}
+
+export interface OmocRalphLoopConfig {
+  enabled?: boolean;
+  default_max_iterations?: number;
+  state_dir?: string;
+}
+
+export interface OmocSkillSourceConfig {
+  path: string;
+  recursive?: boolean;
+  glob?: string;
+}
+
+export interface OmocSkillEntryConfig {
+  description?: string;
+  template?: string;
+  from?: string;
+  model?: string;
+  agent?: string;
+  subtask?: boolean;
+  'argument-hint'?: string;
+  license?: string;
+  compatibility?: string;
+  metadata?: Record<string, unknown>;
+  'allowed-tools'?: string[];
+  disable?: boolean;
+}
+
+export interface OmocSkillsConfig {
+  sources?: Array<string | OmocSkillSourceConfig>;
+  enable?: string[];
+  disable?: string[];
+  [key: string]:
+    | boolean
+    | OmocSkillEntryConfig
+    | Array<string | OmocSkillSourceConfig>
+    | string[]
+    | undefined;
 }
 
 export interface OhMyOpenCodeConfig {
@@ -67,8 +171,15 @@ export interface OhMyOpenCodeConfig {
   disabled_agents?: string[];
   disabled_mcps?: string[];
   disabled_skills?: string[];
+  disabled_commands?: string[];
   claude_code?: OmocClaudeCodeConfig;
   experimental?: OmocExperimentalConfig;
+  auto_update?: boolean;
+  comment_checker?: OmocCommentCheckerConfig;
+  git_master?: OmocGitMasterConfig;
+  notification?: OmocNotificationConfig;
+  ralph_loop?: OmocRalphLoopConfig;
+  skills?: string[] | OmocSkillsConfig;
 }
 
 // 预设模板类型

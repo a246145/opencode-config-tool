@@ -42,7 +42,7 @@ const TOOL_CATEGORIES = {
   execution: {
     name: '执行',
     icon: Terminal,
-    tools: ['bash', 'task', 'skill', 'lsp'],
+    tools: ['bash', 'task', 'skill', 'lsp', 'question'],
   },
   todo: {
     name: 'Todo',
@@ -74,6 +74,7 @@ const TOOL_DESCRIPTIONS: Record<string, string> = {
   lsp: 'LSP 查询',
   todoread: '读取 Todo 列表',
   todowrite: '写入 Todo 列表',
+  question: '询问用户',
   webfetch: '获取 URL 内容',
   websearch: '网页搜索',
   codesearch: '代码搜索',

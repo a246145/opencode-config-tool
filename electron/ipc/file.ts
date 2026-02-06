@@ -3,6 +3,32 @@ import { ipcMain, dialog } from 'electron';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
+
+const execFileAsync = promisify(execFile);
+
+const buildCommandEnv = (): NodeJS.ProcessEnv => {
+  const env = { ...process.env };
+  const extraPaths: string[] = [];
+
+  // Add opencode's default installation path
+  extraPaths.push(path.join(os.homedir(), '.opencode', 'bin'));
+
+  if (process.platform === 'darwin') {
+    extraPaths.push('/usr/local/bin', '/opt/homebrew/bin', '/opt/homebrew/sbin');
+  }
+
+  if (process.platform !== 'win32') {
+    extraPaths.push(path.join(os.homedir(), '.local', 'bin'));
+  }
+
+  if (extraPaths.length > 0) {
+    env.PATH = [env.PATH, ...extraPaths].filter(Boolean).join(path.delimiter);
+  }
+
+  return env;
+};
 
 // 获取跨平台配置目录
 // OpenCode 官方文档: ~/.config/opencode/ (所有平台统一)
@@ -31,6 +57,55 @@ async function ensureDir(filePath: string): Promise<void> {
   } catch {
     await fs.mkdir(dir, { recursive: true });
   }
+}
+
+type OpencodeCommand = {
+  command: string;
+  args: string[];
+};
+
+const buildOpencodeCommands = (args: string[]): OpencodeCommand[] => {
+  const commands: OpencodeCommand[] = [
+    { command: 'opencode', args },
+  ];
+
+  if (process.platform === 'win32') {
+    commands.unshift({ command: 'opencode.exe', args });
+    commands.push({ command: 'opencode.cmd', args });
+    commands.push({ command: 'npx.cmd', args: ['opencode', ...args] });
+  } else {
+    commands.push({ command: 'npx', args: ['opencode', ...args] });
+  }
+
+  return commands;
+};
+
+async function runOpencodeModels(provider?: string): Promise<string> {
+  const args = ['models', ...(provider ? [provider] : [])];
+  const commands = buildOpencodeCommands(args);
+  let lastError: unknown = null;
+
+  for (const { command, args: cmdArgs } of commands) {
+    try {
+      const result = await execFileAsync(command, cmdArgs, {
+        timeout: 15000,
+        maxBuffer: 1024 * 1024,
+        env: buildCommandEnv(),
+      });
+      return result.stdout || '';
+    } catch (error) {
+      lastError = error;
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  if (lastError) {
+    throw lastError;
+  }
+  throw new Error('opencode command not found');
 }
 
 export function setupFileIpc(): void {
@@ -94,5 +169,9 @@ export function setupFileIpc(): void {
       ],
     });
     return result.canceled ? null : result.filePath;
+  });
+
+  ipcMain.handle('opencode-models', async (_, provider?: string) => {
+    return runOpencodeModels(provider);
   });
 }

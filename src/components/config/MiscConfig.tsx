@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { User, Bot, Ban, CheckCircle, FolderSearch, Building2, Eye, Plus, X } from 'lucide-react';
-import { useState } from 'react';
+import { Textarea } from '@/components/ui/textarea';
+import { useEffect, useState, type ChangeEvent } from 'react';
 import { useConfigStore } from '@/hooks/useConfig';
+import { TOOL_PERMISSIONS } from '@/types/config';
 
 export function MiscConfigPanel() {
   const { config, updateConfig } = useConfigStore();
@@ -15,6 +17,22 @@ export function MiscConfigPanel() {
   const [newEnabledProvider, setNewEnabledProvider] = useState('');
   const [newIgnorePattern, setNewIgnorePattern] = useState('');
   const [newSkillPath, setNewSkillPath] = useState('');
+  const [commandJson, setCommandJson] = useState('');
+  const [commandError, setCommandError] = useState<string | null>(null);
+  const [modeJson, setModeJson] = useState('');
+  const [modeError, setModeError] = useState<string | null>(null);
+  const commandPlaceholder = '{\n  "my-command": {\n    "template": "..."\n  }\n}';
+  const modePlaceholder = '{\n  "build": {\n    "model": "..."\n  }\n}';
+
+  useEffect(() => {
+    setCommandJson(config.command ? JSON.stringify(config.command, null, 2) : '');
+    setCommandError(null);
+  }, [config.command]);
+
+  useEffect(() => {
+    setModeJson(config.mode ? JSON.stringify(config.mode, null, 2) : '');
+    setModeError(null);
+  }, [config.mode]);
 
   // Provider 管理
   const addDisabledProvider = () => {
@@ -326,6 +344,135 @@ export function MiscConfigPanel() {
             })}
             placeholder="https://opencode.your-company.com"
           />
+        </CardContent>
+      </Card>
+
+      {/* 兼容与高级配置 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FolderSearch className="h-5 w-5" />
+            兼容与高级配置
+          </CardTitle>
+          <CardDescription>
+            包含兼容字段和高级配置项
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>日志级别</Label>
+              <Select
+                value={config.logLevel || 'INFO'}
+                onValueChange={(value: 'DEBUG' | 'INFO' | 'WARN' | 'ERROR') => updateConfig({ logLevel: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="DEBUG">DEBUG</SelectItem>
+                  <SelectItem value="INFO">INFO</SelectItem>
+                  <SelectItem value="WARN">WARN</SelectItem>
+                  <SelectItem value="ERROR">ERROR</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>布局模式 (Deprecated)</Label>
+              <Select
+                value={config.layout || 'auto'}
+                onValueChange={(value: 'auto' | 'stretch') => updateConfig({ layout: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="auto">auto</SelectItem>
+                  <SelectItem value="stretch">stretch</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label>自动分享 (Deprecated)</Label>
+              <p className="text-xs text-muted-foreground">使用 share 字段替代</p>
+            </div>
+            <Switch
+              checked={config.autoshare ?? false}
+              onCheckedChange={(checked) => updateConfig({ autoshare: checked })}
+            />
+          </div>
+
+          <div>
+            <Label>工具开关 (Deprecated)</Label>
+            <div className="mt-2 grid grid-cols-4 gap-2">
+              {TOOL_PERMISSIONS.map((tool) => (
+                <div key={tool} className="flex items-center justify-between p-2 bg-muted/50 rounded">
+                  <Label className="text-xs font-mono">{tool}</Label>
+                  <Switch
+                    checked={config.tools?.[tool] !== false}
+                    onCheckedChange={(checked) => updateConfig({
+                      tools: { ...config.tools, [tool]: checked }
+                    })}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <Label>命令配置 (JSON)</Label>
+            <Textarea
+              className="mt-1 font-mono text-xs"
+              rows={4}
+              placeholder={commandPlaceholder}
+              value={commandJson}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setCommandJson(e.target.value)}
+              onBlur={() => {
+                if (!commandJson.trim()) {
+                  setCommandError(null);
+                  updateConfig({ command: undefined });
+                  return;
+                }
+                try {
+                  const parsed = JSON.parse(commandJson);
+                  setCommandError(null);
+                  updateConfig({ command: parsed });
+                } catch (parseError) {
+                  setCommandError(parseError instanceof Error ? parseError.message : '无效 JSON');
+                }
+              }}
+            />
+            {commandError && <p className="text-xs text-destructive">{commandError}</p>}
+          </div>
+
+          <div>
+            <Label>兼容模式配置 (JSON)</Label>
+            <Textarea
+              className="mt-1 font-mono text-xs"
+              rows={4}
+              placeholder={modePlaceholder}
+              value={modeJson}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setModeJson(e.target.value)}
+              onBlur={() => {
+                if (!modeJson.trim()) {
+                  setModeError(null);
+                  updateConfig({ mode: undefined });
+                  return;
+                }
+                try {
+                  const parsed = JSON.parse(modeJson);
+                  setModeError(null);
+                  updateConfig({ mode: parsed });
+                } catch (parseError) {
+                  setModeError(parseError instanceof Error ? parseError.message : '无效 JSON');
+                }
+              }}
+            />
+            {modeError && <p className="text-xs text-destructive">{modeError}</p>}
+          </div>
         </CardContent>
       </Card>
     </div>

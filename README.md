@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.5-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.6-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
 
@@ -164,19 +164,19 @@ OpenCode 懒人配置工具是一个基于 Electron + React 的桌面应用程�
 ### 方式一：下载预编译版本（推荐）
 
 #### Windows
-1. 前往 [Releases](https://github.com/a246145/opencode-config-tool/releases) 页面
+1. 前往 [Releases](https://github.com/keh4l/opencode-config-tool/releases) 页面
 2. 下载最新版本的 `OpenCode-Config-Tool-Setup-x.x.x.exe`
 3. 双击安装程序，按提示完成安装
 4. 从开始菜单启动应用
 
 #### macOS
-1. 前往 [Releases](https://github.com/a246145/opencode-config-tool/releases) 页面
+1. 前往 [Releases](https://github.com/keh4l/opencode-config-tool/releases) 页面
 2. 下载最新版本的 `OpenCode-Config-Tool-x.x.x.dmg`
 3. 打开 DMG 文件，将应用拖入 Applications 文件夹
 4. 从启动台启动应用
 
 #### Linux
-1. 前往 [Releases](https://github.com/a246145/opencode-config-tool/releases) 页面
+1. 前往 [Releases](https://github.com/keh4l/opencode-config-tool/releases) 页面
 2. 下载最新版本的 `OpenCode-Config-Tool-x.x.x.AppImage`
 3. 添加执行权限：
    ```bash
@@ -198,7 +198,7 @@ OpenCode 懒人配置工具是一个基于 Electron + React 的桌面应用程�
 
 1. **克隆仓库**
    ```bash
-   git clone https://github.com/a246145/opencode-config-tool.git
+   git clone https://github.com/keh4l/opencode-config-tool.git
    cd opencode-config-tool
    ```
 
@@ -876,9 +876,9 @@ SOFTWARE.
 
 ## 📞 联系方式
 
-- **项目主页**：[GitHub Repository](https://github.com/a246145/opencode-config-tool)
-- **问题反馈**：[GitHub Issues](https://github.com/a246145/opencode-config-tool/issues)
-- **功能建议**：[GitHub Discussions](https://github.com/a246145/opencode-config-tool/discussions)
+- **项目主页**：[GitHub Repository](https://github.com/keh4l/opencode-config-tool)
+- **问题反馈**：[GitHub Issues](https://github.com/keh4l/opencode-config-tool/issues)
+- **功能建议**：[GitHub Discussions](https://github.com/keh4l/opencode-config-tool/discussions)
 
 ---
 
@@ -886,7 +886,14 @@ SOFTWARE.
 
 查看完整的版本更新历史和变更记录：**[CHANGELOG.md](CHANGELOG.md)**
 
-### 最新版本 v1.0.5 (2026-02-04)
+### 最新版本 v1.0.6 (2026-02-05)
+- ✨ **模型列表动态获取** - 通过 `opencode models` 命令实时获取可用模型列表（GUI + WebUI 双模式）
+- 🐛 修复 Electron GUI 模式模型列表为空的问题（preload 缺少 IPC 通道）
+- 🐛 修复 WebUI 模式模型列表获取失败（Vite 未代理 API 请求）
+- 🐛 修复 `opencode` 命令路径未包含 `~/.opencode/bin` 的问题
+- ✨ 新增 JSON Schema 验证文件
+
+### v1.0.5 (2026-02-04)
 - ✨ **Oh My OpenCode 配置项完善** - 新增 agents.variant/thinking、categories.temperature/thinking/tools/prompt_append、background_task.modelConcurrency、disabled_skills
 - ✨ **KNOWN_AGENTS 扩展** - 新增 atlas、prometheus、sisyphus-junior、multimodal-looker、general、build、plan 等 7 个官方代理
 - ✨ **OpenCode 配置项完善** - 新增 provider.setCacheKey（Anthropic 缓存键）、lsp.initialization（LSP 初始化参数）
@@ -898,20 +905,6 @@ SOFTWARE.
 - 🐛 修复应用启动崩溃问题（ESM/CommonJS 模块冲突）
 - 📝 构建产物命名优化，包含系统和架构标识
 
-### v1.0.3 (2025-02-03)
-- ✨ **跨平台配置路径支持** - 所有平台统一使用 `~/.config/opencode/` 目录
-- ✨ **模型变体添加对话框** - 使用友好的对话框替代浏览器原生 prompt
-- 🐛 修复 Windows 系统无法正确加载配置的问题
-- 🐛 修复 Windows 窗口标题显示为【OMO 配置】
-- 🐛 修复 Anthropic 扩展思考启用时自动填充默认思考预算 10000
-- 🐛 修复模型变体添加按钮无反应的问题
-
-### v1.0.2 (2026-02-03)
-- ✨ **Oh My OpenCode 独立配置模式** - 顶部 Tab 切换，独立侧边栏和操作按钮
-- ✨ **8 个独立配置面板** - Agents、Categories、后台任务、Tmux、Sisyphus、禁用功能、Claude Code、实验性功能
-- ✨ **模型下拉选择** - 从 OpenCode 配置中加载已配置的模型
-- ✨ **WebUI 加载动画** - 配置加载时显示加载状态
-- 🐛 修复多个 UI 显示问题和 WebUI 服务器兼容性问题
 
 ---
 

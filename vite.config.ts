@@ -37,6 +37,14 @@ export default defineConfig({
     }
   },
   server: {
-    port: 5173
+    port: 5173,
+    proxy: {
+      // 代理 API 请求到后端服务器
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false
+      }
+    }
   }
 })

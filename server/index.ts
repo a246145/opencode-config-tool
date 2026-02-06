@@ -4,6 +4,7 @@ import cors from 'cors';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import configRoutes from './routes/config';
+import modelsRoutes from './routes/models';
 
 // ES modules 中获取 __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -50,6 +51,9 @@ app.get('/api/health', (req: Request, res: Response) => {
 
 // 配置相关路由
 app.use('/api/config', configRoutes);
+
+// 模型列表（opencode models）
+app.use('/api/models', modelsRoutes);
 
 // 模板路由（直接挂载到 /api/templates）
 app.get('/api/templates', configRoutes);
@@ -133,6 +137,7 @@ app.listen(PORT, () => {
   console.log(`   - GET  /api/config?path=xxx`);
   console.log(`   - POST /api/config`);
   console.log(`   - GET  /api/templates`);
+  console.log(`   - GET  /api/models`);
   console.log('='.repeat(60));
 });
 

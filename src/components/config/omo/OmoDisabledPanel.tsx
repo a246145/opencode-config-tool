@@ -4,16 +4,17 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Ban } from 'lucide-react';
-import { KNOWN_HOOKS, KNOWN_MCPS, KNOWN_DISABLED_AGENTS, KNOWN_SKILLS } from '@/lib/oh-my-opencode-defaults';
+import { KNOWN_HOOKS, KNOWN_MCPS, KNOWN_DISABLED_AGENTS, KNOWN_SKILLS, KNOWN_COMMANDS } from '@/lib/oh-my-opencode-defaults';
 import { useOhMyOpenCodeStore } from '@/hooks/useOhMyOpenCode';
 
 export function OmoDisabledPanel() {
-  const { config, toggleDisabledHook, toggleDisabledAgent, toggleDisabledMcp, toggleDisabledSkill } = useOhMyOpenCodeStore();
+  const { config, toggleDisabledHook, toggleDisabledAgent, toggleDisabledMcp, toggleDisabledSkill, toggleDisabledCommand } = useOhMyOpenCodeStore();
 
   const totalDisabled = (config.disabled_hooks?.length || 0) +
     (config.disabled_agents?.length || 0) +
     (config.disabled_mcps?.length || 0) +
-    (config.disabled_skills?.length || 0);
+    (config.disabled_skills?.length || 0) +
+    (config.disabled_commands?.length || 0);
 
   return (
     <ConfigCard
@@ -96,6 +97,26 @@ export function OmoDisabledPanel() {
                 <Switch
                   checked={config.disabled_skills?.includes(skill.id) ?? false}
                   onCheckedChange={() => toggleDisabledSkill(skill.id)}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Commands */}
+        <div>
+          <Label className="mb-2 block text-base font-semibold">禁用的 Commands</Label>
+          <p className="text-xs text-muted-foreground mb-2">禁用后，该命令将不可用</p>
+          <div className="space-y-2">
+            {KNOWN_COMMANDS.map((command) => (
+              <div key={command.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
+                <div>
+                  <span className="font-medium">{command.name}</span>
+                  <p className="text-xs text-muted-foreground">{command.description}</p>
+                </div>
+                <Switch
+                  checked={config.disabled_commands?.includes(command.id) ?? false}
+                  onCheckedChange={() => toggleDisabledCommand(command.id)}
                 />
               </div>
             ))}

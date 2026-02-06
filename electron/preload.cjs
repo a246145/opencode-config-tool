@@ -3,7 +3,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  // 文件操作
   getConfigPath: () => ipcRenderer.invoke('get-config-path'),
   getOmoConfigPath: () => ipcRenderer.invoke('get-omo-config-path'),
   getConfigDir: () => ipcRenderer.invoke('get-config-dir'),
@@ -11,8 +10,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   writeFile: (path, content) => ipcRenderer.invoke('write-file', path, content),
   openFileDialog: () => ipcRenderer.invoke('open-file-dialog'),
   saveFileDialog: (defaultPath) => ipcRenderer.invoke('save-file-dialog', defaultPath),
+  getOpencodeModels: (provider) => ipcRenderer.invoke('opencode-models', provider),
 
-  // 平台信息
   platform: process.platform,
   isElectron: true,
 });

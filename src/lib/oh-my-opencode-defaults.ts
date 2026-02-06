@@ -146,3 +146,8 @@ export const KNOWN_SKILLS = [
   { id: 'devops', name: 'DevOps', description: '运维和部署' },
   { id: 'security', name: '安全专家', description: '安全审计和漏洞检测' },
 ];
+
+export const KNOWN_COMMANDS = [
+  { id: 'init-deep', name: 'init-deep', description: '初始化深度代理知识库' },
+  { id: 'start-work', name: 'start-work', description: '从规划启动工作流程' },
+];
