@@ -328,10 +328,14 @@ export const useConfigStore = create<ConfigState>()(
       // Permission actions
       updatePermission: (tool, rule) => {
         const { config } = get();
+        const permissionObj =
+          typeof config.permission === 'object' && config.permission !== null
+            ? config.permission
+            : {};
         set({
           config: {
             ...config,
-            permission: { ...config.permission, [tool]: rule },
+            permission: { ...permissionObj, [tool]: rule },
           },
           isDirty: true,
         });

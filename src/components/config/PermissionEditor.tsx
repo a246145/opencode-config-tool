@@ -32,6 +32,8 @@ import { Shield, Plus, Trash2, Edit, FileText, Terminal, Globe, Search } from 'l
 import type { PermissionValue, PermissionRule, ToolPermissions } from '@/types/config';
 import { TOOL_PERMISSIONS } from '@/types/config';
 
+type EditablePermissionTool = typeof TOOL_PERMISSIONS[number];
+
 // 工具分类
 const TOOL_CATEGORIES = {
   file: {
@@ -90,13 +92,14 @@ interface GlobRule {
 interface RuleEditorProps {
   tool: string;
   rule: PermissionRule;
+  supportsGlob: boolean;
   onSave: (rule: PermissionRule) => void;
   onClose: () => void;
 }
 
-function RuleEditor({ tool, rule, onSave, onClose }: RuleEditorProps) {
+function RuleEditor({ tool, rule, supportsGlob, onSave, onClose }: RuleEditorProps) {
   const [mode, setMode] = useState<'simple' | 'glob'>(
-    typeof rule === 'string' ? 'simple' : 'glob'
+    !supportsGlob || typeof rule === 'string' ? 'simple' : 'glob'
   );
   const [simpleValue, setSimpleValue] = useState<PermissionValue>(
     typeof rule === 'string' ? rule : 'ask'
@@ -145,18 +148,24 @@ function RuleEditor({ tool, rule, onSave, onClose }: RuleEditorProps) {
 
       <div className="space-y-6 py-4">
         {/* 模式选择 */}
-        <div className="space-y-2">
-          <Label>权限模式</Label>
-          <Select value={mode} onValueChange={(v: 'simple' | 'glob') => setMode(v)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="simple">简单模式 (统一权限)</SelectItem>
-              <SelectItem value="glob">Glob 模式 (模式匹配)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {supportsGlob ? (
+          <div className="space-y-2">
+            <Label>权限模式</Label>
+            <Select value={mode} onValueChange={(v: 'simple' | 'glob') => setMode(v)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="simple">简单模式 (统一权限)</SelectItem>
+                <SelectItem value="glob">Glob 模式 (模式匹配)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            该工具仅支持简单模式（ask / allow / deny）。
+          </p>
+        )}
 
         {mode === 'simple' ? (
           <div className="space-y-2">
@@ -172,7 +181,7 @@ function RuleEditor({ tool, rule, onSave, onClose }: RuleEditorProps) {
               </SelectContent>
             </Select>
           </div>
-        ) : (
+        ) : supportsGlob ? (
           <div className="space-y-4">
             <div className="flex gap-2">
               <Input
@@ -224,7 +233,7 @@ function RuleEditor({ tool, rule, onSave, onClose }: RuleEditorProps) {
               提示: 规则按顺序匹配，最后匹配的规则生效。建议将 "*" 放在最前面作为默认值。
             </p>
           </div>
-        )}
+        ) : null}
       </div>
 
       <DialogFooter>
@@ -237,10 +246,17 @@ function RuleEditor({ tool, rule, onSave, onClose }: RuleEditorProps) {
 
 export function PermissionEditor() {
   const { config, updatePermission } = useConfigStore();
-  const [editingTool, setEditingTool] = useState<string | null>(null);
+  const [editingTool, setEditingTool] = useState<EditablePermissionTool | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const permissions = config.permission || {};
+  const globalDefault = typeof config.permission === 'string' ? config.permission : undefined;
+  const permissions = (typeof config.permission === 'object' && config.permission !== null
+    ? config.permission
+    : {}) as ToolPermissions;
+  const globEnabledTools = new Set<EditablePermissionTool>([
+    'read', 'edit', 'glob', 'grep', 'list',
+    'bash', 'task', 'external_directory', 'lsp', 'skill',
+  ]);
 
   const getPermissionDisplay = (rule: PermissionRule | undefined): string => {
     if (!rule) return '默认';
@@ -297,26 +313,30 @@ export function PermissionEditor() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredTools.map((tool) => (
+            {filteredTools.map((tool) => {
+              const toolKey = tool as EditablePermissionTool;
+              const rule = (permissions[toolKey as keyof ToolPermissions] as PermissionRule | undefined) ?? globalDefault;
+              return (
               <TableRow key={tool}>
                 <TableCell className="font-mono font-medium">{tool}</TableCell>
                 <TableCell className="text-muted-foreground">
                   {TOOL_DESCRIPTIONS[tool]}
                 </TableCell>
-                <TableCell className={getPermissionColor(permissions[tool as keyof ToolPermissions])}>
-                  {getPermissionDisplay(permissions[tool as keyof ToolPermissions])}
+                <TableCell className={getPermissionColor(rule)}>
+                  {getPermissionDisplay(rule)}
                 </TableCell>
                 <TableCell>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setEditingTool(tool)}
+                    onClick={() => setEditingTool(toolKey)}
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
                 </TableCell>
               </TableRow>
-            ))}
+            );
+            })}
           </TableBody>
         </Table>
       </ConfigCard>
@@ -331,12 +351,13 @@ export function PermissionEditor() {
           <ConfigCard key={categoryId} title={category.name} icon={Icon}>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {categoryTools.map((tool) => {
-                const permission = permissions[tool as keyof ToolPermissions];
+                const toolKey = tool as EditablePermissionTool;
+                const permission = (permissions[toolKey as keyof ToolPermissions] as PermissionRule | undefined) ?? globalDefault;
                 return (
                   <div
                     key={tool}
                     className="flex items-center justify-between p-3 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted"
-                    onClick={() => setEditingTool(tool)}
+                    onClick={() => setEditingTool(toolKey)}
                   >
                     <div>
                       <div className="font-mono text-sm font-medium">{tool}</div>
@@ -358,7 +379,8 @@ export function PermissionEditor() {
         {editingTool && (
           <RuleEditor
             tool={editingTool}
-            rule={permissions[editingTool as keyof ToolPermissions] || 'ask'}
+            rule={((permissions[editingTool as keyof ToolPermissions] as PermissionRule | undefined) ?? globalDefault) || 'ask'}
+            supportsGlob={globEnabledTools.has(editingTool)}
             onSave={(rule) => {
               updatePermission(editingTool, rule);
               setEditingTool(null);
