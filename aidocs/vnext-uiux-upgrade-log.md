@@ -1144,3 +1144,31 @@ How to verify：
 验证：
 
 - `npm run check`：通过。
+
+---
+
+## 33) 2026-02-07 14:17（CST）修复 @modified 轻提示文本溢出侧栏（强制收缩 + 截断）
+
+Why：
+
+- 下方轻提示在部分宽度下仍可能出现横向溢出（主要原因：inline/flex 项未正确收缩，导致文字不截断而撑出容器）。
+
+What：
+
+- 将提示行容器加上 `overflow-hidden`，并将内容改为 `flex` 容器：
+  - Tag `shrink-0`
+  - 文案 `flex-1 min-w-0 truncate`
+- 确保提示始终在侧栏内截断显示，不越界。
+
+Where：
+
+- `src/components/layout/Sidebar.tsx`
+
+How to verify：
+
+- 缩窄侧栏宽度：提示行不会横向越界；文案会正常截断为省略号。
+- 输入框/焦点态/清除按钮不受影响。
+
+验证：
+
+- `npm run check`：通过。
