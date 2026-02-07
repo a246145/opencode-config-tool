@@ -1114,3 +1114,33 @@ How to verify：
 验证：
 
 - `npm run check`：通过。
+
+---
+
+## 32) 2026-02-07 14:13（CST）补齐 @modified 可发现性：搜索框下方轻提示（不回退 placeholder）
+
+Why：
+
+- 右侧提示为避免溢出已收敛为快捷键展示，导致 `@modified` 能力不可发现。
+- 不能把长说明塞回 placeholder（会重新引入截断/溢出风险）。
+
+What：
+
+- 在搜索框下方新增一行“轻提示”，明确展示 `@modified`：
+  - 窄宽：`@modified` Tag + `只看已修改`
+  - 稍宽：`@modified` Tag + `提示：输入 @modified 查看本次修改`
+- 保持不撑宽：提示与输入框同容器宽度，`min-w-0` + `truncate`，不参与输入框内部布局。
+- 可访问性：`aria-describedby` 关联到可见提示与 sr-only 描述，读屏可获取完整说明。
+
+Where：
+
+- `src/components/layout/Sidebar.tsx`
+
+How to verify：
+
+- 默认状态下即可看到 `@modified` 提示；缩窄侧栏宽度也不会出现截断残缺/溢出。
+- 输入时不影响输入体验（提示不遮挡输入内容）。
+
+验证：
+
+- `npm run check`：通过。
