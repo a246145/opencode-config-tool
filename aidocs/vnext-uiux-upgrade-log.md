@@ -1050,3 +1050,37 @@
 - 回滚点：
   - 将 `docs/vnext-uiux-upgrade-log.md` 恢复为完整日志副本（不推荐，会再次产生分叉风险）。
   - 或移除 `check:upgrade-log` 前置校验（不推荐）。
+
+---
+
+## 30) 2026-02-07 13:52（CST）修复侧栏搜索提示在窄宽度下被裁切（placeholder 收敛 + 右侧辅助提示）
+
+Why：
+
+- 侧栏搜索框 placeholder 之前包含过长说明（快捷键 + @ 语法），在窄宽度下会被裁切成“支持 @…”的残缺文本，影响观感与可理解性。
+
+What：
+
+- placeholder 收敛为短文案：`搜索…`。
+- 将“Cmd/Ctrl+K”与“支持 @modified”的帮助信息移到输入框右侧辅助提示（suffix/hint）。
+- 辅助提示响应式：
+  - 窄宽下只显示更短的快捷键提示（⌘K；sm 起显示 Ctrl K）
+  - 更宽时才显示“支持 @modified”（lg 起显示）
+- 可访问性：不把关键信息仅放在 placeholder；增加 `aria-describedby` + sr-only 描述。
+
+Where：
+
+- `src/components/layout/Sidebar.tsx`
+
+How to verify：
+
+- 缩窄窗口/侧栏宽度：搜索框提示不再出现残缺长 placeholder；右侧提示要么完整显示、要么整体隐藏/折叠，不出现“像没写完”。
+- 输入与清除按钮不互相遮挡；输入时辅助提示自动隐藏。
+
+验证：
+
+- `npm run check`：通过。
+
+Notes：
+
+- 右侧辅助提示使用 `pointer-events-none`，不会干扰输入框交互。

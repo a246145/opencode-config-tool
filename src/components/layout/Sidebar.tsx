@@ -393,9 +393,36 @@ export function Sidebar({ activeItem, onItemChange, collapsed = false, onCollaps
                 ref={searchRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="搜索（Cmd/Ctrl+K，支持 @modified）"
-                className={cn('pl-8', query.trim() ? 'pr-10' : '')}
+                placeholder="搜索…"
+                aria-describedby="sidebar-search-help"
+                className={cn('pl-8', query.trim() ? 'pr-10' : 'pr-24 sm:pr-32 lg:pr-56')}
               />
+
+              {/* 读屏提示：不要把关键信息塞进 placeholder */}
+              <span id="sidebar-search-help" className="sr-only">
+                侧栏搜索。快捷键：Cmd 或 Ctrl + K 聚焦。支持语法：@modified。
+              </span>
+
+              {/* 辅助提示：仅在空输入时展示，避免挡住输入内容 */}
+              {!query.trim() && (
+                <div
+                  className={cn(
+                    'pointer-events-none absolute right-2 top-1/2 -translate-y-1/2',
+                    'flex items-center gap-2 text-xs text-muted-foreground'
+                  )}
+                >
+                  <span className="inline-flex items-center gap-1">
+                    <kbd className="rounded border border-border bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] leading-none text-muted-foreground">
+                      ⌘K
+                    </kbd>
+                    <kbd className="hidden sm:inline-flex rounded border border-border bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] leading-none text-muted-foreground">
+                      Ctrl K
+                    </kbd>
+                  </span>
+                  <span className="hidden lg:inline">支持 @modified</span>
+                </div>
+              )}
+
               {query.trim() && (
                 <button
                   type="button"
