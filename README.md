@@ -198,7 +198,7 @@ OpenCode 懒人配置工具是一个基于 Electron + React 的桌面应用程�
 
 1. **克隆仓库**
    ```bash
-git clone https://github.com/keh4l/opencode-config-tool.git
+   git clone https://github.com/keh4l/opencode-config-tool.git
    cd opencode-config-tool
    ```
 
